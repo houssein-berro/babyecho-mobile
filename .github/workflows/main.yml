@@ -11,5 +11,5 @@ jobs:
       uses: peter-evans/repository-dispatch@v1
       with:
         token: ${{ secrets.PAT }}
-        repository: houssein-berro/babyecho-mobile
+        repository: houssein-berro/BabyEcho
         event-type: update-submodules-event
