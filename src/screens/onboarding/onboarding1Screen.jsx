@@ -6,7 +6,10 @@ export default function Onboarding1Screen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Understand Your Baby's Needs</Text>
-      
+      <Image
+        source={require('../assets/onboarding1.png')}
+        style={styles.image}
+      />
       <Text style={styles.subtitle}>Our cry analyzer helps you decode your baby's needs in real-time</Text>
       <Button
         title="Continue"
