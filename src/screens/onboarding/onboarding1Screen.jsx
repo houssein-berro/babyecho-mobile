@@ -33,7 +33,11 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 20,
   },
-
+  image: {
+    width: 250,
+    height: 250,
+    marginBottom: 20,
+  },
   subtitle: {
     fontSize: 16,
     color: '#666666',
