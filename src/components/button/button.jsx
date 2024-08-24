@@ -43,5 +43,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-
+  outlinedButtonText: {
+    color: '#FF7F50',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
