@@ -22,9 +22,20 @@ const authSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
- 
-    }
-  
+    signupStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    signupSuccess(state, action) {
+      state.user = action.payload;
+      state.loading = false;
+    },
+    signupFailure(state, action) {
+      state.error = action.payload;
+      state.loading = false;
+    },
+    
+  }
 });
 
 export const { loginStart, loginSuccess, loginFailure, signupStart, signupSuccess, signupFailure, logout } = authSlice.actions;
