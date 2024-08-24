@@ -5,7 +5,7 @@ import Button from '../components/Button';
 
 export default function Onboarding2Screen({ navigation }) {
   return (
-    <View>
+    <ScreenWrapper>
       <Text style={styles.title}>Stay Informed Instantly</Text>
       <Image
         source={require('../assets/onboarding2.png')} 
@@ -22,7 +22,7 @@ export default function Onboarding2Screen({ navigation }) {
         outlined={true} 
         style={styles.signupButton}
       />
-    </View>
+    </ScreenWrapper>
   );
 }
 
