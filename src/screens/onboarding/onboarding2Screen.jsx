@@ -8,7 +8,7 @@ export default function Onboarding2Screen({ navigation }) {
     <ScreenWrapper>
       <Text style={styles.title}>Stay Informed Instantly</Text>
       <Image
-        source={require('../assets/onboarding2.png')} 
+        source={require('../assets/onboarding2.png')}
         style={styles.image}
       />
       <Text style={styles.subtitle}>Get alerts when your baby needs attention.</Text>
@@ -26,3 +26,25 @@ export default function Onboarding2Screen({ navigation }) {
   );
 }
 
+const styles = StyleSheet.create({
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginBottom: 20,
+  },
+  image: {
+    width: 250,
+    height: 250,
+    marginBottom: 20,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666666',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  signupButton: {
+    marginTop: 10,
+  },
+});
