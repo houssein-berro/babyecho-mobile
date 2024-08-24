@@ -20,7 +20,7 @@ export default function LoginScreen({ navigation }) {
     <ScreenWrapper>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+        style={{ flex: 1 }} 
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
       >
         <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
