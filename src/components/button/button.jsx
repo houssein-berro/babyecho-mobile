@@ -31,11 +31,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filledButton: {
-    backgroundColor: '#FF7F50',
+    backgroundColor: '#EF8D7F',
   },
   outlinedButton: {
     backgroundColor: '#FFFFFF',
-    borderColor: '#FF7F50',
+    borderColor: '#EF8D7F',
     borderWidth: 2,
   },
   filledButtonText: {
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   outlinedButtonText: {
-    color: '#FF7F50',
+    color: '#EF8D7F',
     fontSize: 16,
     fontWeight: 'bold',
   },
