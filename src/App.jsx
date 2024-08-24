@@ -4,6 +4,7 @@ import OnboardingNavigator from './components/navigation/onboardingNavigator';
 // import LoginScreen from './screens/LoginScreen';
 // import SignupScreen from './screens/SignupScreen';
   import MainStackNavigator from './components/navigation/mainStackNavigator'; // Assuming you have a main app navigator
+import LoginScreen from './screens/auth/loginScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,13 +17,18 @@ export default function App() {
           component={OnboardingNavigator}
           options={{ headerShown: false }}
         />
+         <Stack.Screen
+        name="Login"
+        component={LoginScreen} 
+        options={{ headerShown: false }}
+      />
+    
         <Stack.Screen
           name="Main"
           component={MainStackNavigator}
           options={{ headerShown: false }}
         />
-        {/* <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Signup" component={SignupScreen} /> */}
+
       </Stack.Navigator>
     </NavigationContainer>
   );
