@@ -20,13 +20,7 @@ export default function Onboarding1Screen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-  },
+
   title: {
     fontSize: 24,
     fontWeight: 'bold',
