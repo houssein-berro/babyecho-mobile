@@ -7,6 +7,8 @@ export const loginUser = (userData) => async (dispatch) => {
   dispatch(loginStart());
   try {
     const response = await axios.post(`${process.env.BACKEND_URL}/auth/login`, userData);
+    console.log('1222222222',process.env);
+    
     dispatch(loginSuccess(response.data));
     console.log(response.data);
 
