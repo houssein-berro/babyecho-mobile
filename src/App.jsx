@@ -4,7 +4,7 @@ import { store } from './redux/store';
 import { Provider } from 'react-redux';
 
 import OnboardingNavigator from './components/navigation/onboardingNavigator';
-import MainStackNavigator from './components/navigation/mainStackNavigator'; // Assuming you have a main app navigator
+import MainStackNavigator from './components/navigation/mainStackNavigator';
 import LoginScreen from './screens/auth/loginScreen';
 
 const Stack = createNativeStackNavigator();
