@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   outlinedButton: {
     backgroundColor: '#FFFFFF',
     borderColor: '#EF8D7F',
-    borderWidth: 1,
+    borderWidth: 1, 
   },
   filledButtonText: {
     color: '#FFFFFF',
