@@ -82,3 +82,69 @@ export default function SignupScreen({ navigation }) {
     </ScreenWrapper>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  logo: {
+    width: 150,
+    height: 150,
+    resizeMode: 'contain',
+  },
+  coloredContainer: {
+    padding: 20,
+    backgroundColor: '#F7F8FA',
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  formContainer: {
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#424242',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  input: {
+    width: '100%',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 10,
+    backgroundColor: '#FAFAFA',
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  signupWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  signupText: {
+    fontSize: 14,
+    color: '#757575',
+  },
+  signupLink: {
+    fontSize: 14,
+    color: '#007BFF',
+    fontWeight: '600',
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'left',
+    marginBottom: 10,
+  },
+});
