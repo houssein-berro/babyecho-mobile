@@ -12,24 +12,25 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../../redux/auth/authActions';
+import { signupUser } from '../../redux/auth/authActions';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import Button from '../../components/button/button';
 
-export default function LoginScreen({ navigation }) {
+export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [slideAnim] = useState(new Animated.Value(300));
   const dispatch = useDispatch();
-  const { loading, error, user } = useSelector(state => state.user); 
+  const { loading, error, user } = useSelector(state => state.user);
 
-  const handleLogin = userData => {
-    dispatch(loginUser(userData));
+  const handleSignup = userData => {
+    dispatch(signupUser(userData));
   };
 
   useEffect(() => {
     Animated.timing(slideAnim, {
-      toValue: 0, 
+      toValue: 0,
       duration: 800,
       useNativeDriver: true,
     }).start();
@@ -37,7 +38,7 @@ export default function LoginScreen({ navigation }) {
 
   useEffect(() => {
     if (user) {
-      navigation.replace('Main');  
+      navigation.replace('Main');
     }
   }, [user, navigation]);
 
@@ -57,7 +58,15 @@ export default function LoginScreen({ navigation }) {
           </View>
           <View style={styles.coloredContainer}>
             <View style={styles.formContainer}>
-              <Text style={styles.title}>Login</Text>
+              <Text style={styles.title}>Sign Up</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+                placeholderTextColor="#9E9E9E"
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -76,20 +85,16 @@ export default function LoginScreen({ navigation }) {
                 placeholderTextColor="#9E9E9E"
               />
               {error && <Text style={styles.errorText}>{error}</Text>}
-              <TouchableOpacity
-                onPress={() => navigation.navigate('ForgotPassword')}>
-                <Text style={styles.forgotPassword}>Forgot your password?</Text>
-              </TouchableOpacity>
               <Button
-                title={loading ? <ActivityIndicator color="#fff" /> : 'Login'}
-                onPress={() => handleLogin({ email, password })}
+                title={loading ? <ActivityIndicator color="#fff" /> : 'Sign Up'}
+                onPress={() => handleSignup({ username, email, password })}
                 disabled={loading}
               />
             </View>
             <View style={styles.signupWrapper}>
-              <Text style={styles.signupText}>Don't have an account? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                <Text style={styles.signupLink}>Sign up</Text>
+              <Text style={styles.signupText}>Already have an account? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.signupLink}>Login</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -143,13 +148,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
     marginBottom: 15,
     fontSize: 16,
-  },
-  forgotPassword: {
-    color: '#007BFF',
-    textAlign: 'right',
-    marginBottom: 20,
-    fontWeight: '500',
-    fontSize: 14,
   },
   signupWrapper: {
     flexDirection: 'row',
