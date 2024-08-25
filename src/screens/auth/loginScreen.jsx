@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-    textAlign: 'center',
+    textAlign: 'left',
     marginBottom: 10,
   },
 });
