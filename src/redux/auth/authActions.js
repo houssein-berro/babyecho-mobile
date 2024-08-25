@@ -1,19 +1,20 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {BACKEND_URL} from '@env'
 import { loginStart, loginSuccess, loginFailure, signupStart, signupSuccess, signupFailure } from './authSlice';
 
 // Login action creator
 export const loginUser = (userData) => async (dispatch) => {
   dispatch(loginStart());
   try {
-    const response = await axios.post(`${process.env.BACKEND_URL}/auth/login`, userData);
-    console.log('1222222222',process.env);
-    
+    const response = await axios.post(`${BACKEND_URL}/api/auth/login`, userData);
     dispatch(loginSuccess(response.data));
-    console.log(response.data);
+    console.log('Login Successful:', response.data);
 
     await AsyncStorage.setItem('token', response?.data.token);
+
   } catch (error) {
+    console.error('Login Error:', error);
     dispatch(loginFailure(error.response?.data?.message || error.message || "Login failed"));
   }
 };
@@ -28,4 +29,4 @@ export const signupUser = (userData) => async (dispatch) => {
   } catch (error) {
     dispatch(signupFailure(error.response?.data?.message || error.message || "Signup failed"));
   }
-}; 
+};
