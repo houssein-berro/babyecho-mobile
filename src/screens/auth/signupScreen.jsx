@@ -20,7 +20,7 @@ export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
- 
+
   return (
     <ScreenWrapper>
       <KeyboardAvoidingView
