@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,17 +11,17 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {loginUser} from '../../redux/auth/authActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../../redux/auth/authActions';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import Button from '../../components/button/button';
 
-export default function LoginScreen({navigation}) {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [slideAnim] = useState(new Animated.Value(300));
   const dispatch = useDispatch();
-  const {loading, error} = useSelector(state => state.user);
+  const { loading, error, user } = useSelector(state => state.user); 
 
   const handleLogin = userData => {
     dispatch(loginUser(userData));
@@ -29,20 +29,26 @@ export default function LoginScreen({navigation}) {
 
   useEffect(() => {
     Animated.timing(slideAnim, {
-      toValue: 0, // End position (on-screen)
+      toValue: 0, 
       duration: 800,
       useNativeDriver: true,
     }).start();
   }, [slideAnim]);
 
+  useEffect(() => {
+    if (user) {
+      navigation.replace('Main');  
+    }
+  }, [user, navigation]);
+
   return (
     <ScreenWrapper>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
         <Animated.View
-          style={[styles.container, {transform: [{translateY: slideAnim}]}]}>
+          style={[styles.container, { transform: [{ translateY: slideAnim }] }]}>
           <View style={styles.logoContainer}>
             <Image
               source={require('../../assets/public/logo.png')}
@@ -76,7 +82,7 @@ export default function LoginScreen({navigation}) {
               </TouchableOpacity>
               <Button
                 title={loading ? <ActivityIndicator color="#fff" /> : 'Login'}
-                onPress={() => handleLogin({email, password})}
+                onPress={() => handleLogin({ email, password })}
                 disabled={loading}
               />
             </View>
@@ -112,7 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F8FA',
     borderRadius: 15,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1,
     elevation: 1,
