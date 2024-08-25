@@ -23,9 +23,9 @@ export default function LoginScreen({navigation}) {
   const dispatch = useDispatch();
   const {loading, error} = useSelector(state => state.user);
 
-  // const handleLogin = userData => {
-  //   dispatch(loginUser(userData));
-  // };
+  const handleLogin = userData => {
+    dispatch(loginUser(userData));
+  };
 
   useEffect(() => {
     Animated.timing(slideAnim, {
