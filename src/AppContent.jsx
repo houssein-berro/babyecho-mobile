@@ -17,6 +17,23 @@ export default function AppContent() {
   const dispatch = useDispatch();
   const [initialRoute, setInitialRoute] = useState('Onboarding');
 
+  useEffect(() => {
+    const checkToken = async () => {
+      const isValid = await dispatch(validateToken());
+      if (isValid) {
+        setInitialRoute('Main');
+      } else {
+        await AsyncStorage.removeItem('token');
+        setInitialRoute('Onboarding');
+      }
+      setIsLoading(false);
+    };
+    checkToken();
+  }, [dispatch]);
+
+  if (isLoading) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <NavigationContainer>
