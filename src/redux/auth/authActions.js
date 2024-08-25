@@ -23,7 +23,7 @@ export const loginUser = (userData) => async (dispatch) => {
 export const signupUser = (userData) => async (dispatch) => {
   dispatch(signupStart());
   try {
-    const response = await axios.post(`${process.env.BACKEND_URL}/auth/signup`, userData);
+    const response = await axios.post(`${process.env.BACKEND_URL}/api/auth/register`, userData);
     dispatch(signupSuccess(response.data));
     await AsyncStorage.setItem('token', response?.data.token);
   } catch (error) {
