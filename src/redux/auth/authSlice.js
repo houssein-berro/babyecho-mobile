@@ -36,7 +36,11 @@ const authSlice = createSlice({
     },
     logout(state) {
       state.user = null;
-    }
+    },
+    loadUser(state, action) {
+      state.user = action.payload;
+    },
+
   }
 });
 
