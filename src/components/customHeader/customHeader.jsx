@@ -9,3 +9,19 @@ const CustomHeader = ({ title }) => {
   );
 };
 
+const styles = StyleSheet.create({
+  headerContainer: {
+    height: 80,
+    backgroundColor: '#EF8D7F', 
+    justifyContent: 'center',
+    alignItems: 'start',
+    paddingLeft: 20,
+  },
+  headerTitle: {
+    color: '#FFFFFF',
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+});
+
+export default CustomHeader;
