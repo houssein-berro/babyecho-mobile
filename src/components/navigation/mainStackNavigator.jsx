@@ -14,7 +14,7 @@ export default function MainStackNavigator() {
         component={HomeScreen}
         options={{
           header: () => <CustomHeader title="Home" />, // Use the custom header
-        }}
+        }} 
       />
       <Stack.Screen
         name="Details"
