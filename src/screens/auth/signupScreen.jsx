@@ -29,6 +29,14 @@ export default function SignupScreen({ navigation }) {
   };
 
   useEffect(() => {
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+  }, [slideAnim]);
+
+  useEffect(() => {
     if (user) {
       navigation.replace('Main');
     }
