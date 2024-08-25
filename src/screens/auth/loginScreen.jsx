@@ -1,12 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Animated, KeyboardAvoidingView, Platform } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {loginUser} from '../../redux/auth/authActions';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import Button from '../../components/button/button';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [slideAnim] = useState(new Animated.Value(300)); // Start position (off-screen)
+  const [slideAnim] = useState(new Animated.Value(300));
+  const dispatch = useDispatch();
+  const {loading, error} = useSelector(state => state.user);
+
+  // const handleLogin = userData => {
+  //   dispatch(loginUser(userData));
+  // };
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -20,10 +39,10 @@ export default function LoginScreen({ navigation }) {
     <ScreenWrapper>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
-      >
-        <Animated.View style={[styles.container, { transform: [{ translateY: slideAnim }] }]}>
+        style={{flex: 1}}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+        <Animated.View
+          style={[styles.container, {transform: [{translateY: slideAnim}]}]}>
           <View style={styles.logoContainer}>
             <Image
               source={require('../../assets/public/logo.png')}
@@ -50,12 +69,15 @@ export default function LoginScreen({ navigation }) {
                 secureTextEntry
                 placeholderTextColor="#9E9E9E"
               />
-              <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+              {error && <Text style={styles.errorText}>{error}</Text>}
+              <TouchableOpacity
+                onPress={() => navigation.navigate('ForgotPassword')}>
                 <Text style={styles.forgotPassword}>Forgot your password?</Text>
               </TouchableOpacity>
               <Button
-                title="Login"
-                onPress={() => navigation.navigate('Main')}
+                title={loading ? <ActivityIndicator color="#fff" /> : 'Login'}
+                onPress={() => handleLogin({email, password})}
+                disabled={loading}
               />
             </View>
             <View style={styles.signupWrapper}>
@@ -78,7 +100,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 10, 
+    marginBottom: 10,
   },
   logo: {
     width: 150,
@@ -87,10 +109,10 @@ const styles = StyleSheet.create({
   },
   coloredContainer: {
     padding: 20,
-    backgroundColor: '#F7F8FA', 
+    backgroundColor: '#F7F8FA',
     borderRadius: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.2,
     shadowRadius: 1,
     elevation: 1,
@@ -136,5 +158,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#007BFF',
     fontWeight: '600',
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
   },
 });
