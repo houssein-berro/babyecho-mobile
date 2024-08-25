@@ -20,6 +20,19 @@ export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [slideAnim] = useState(new Animated.Value(300));
+  const dispatch = useDispatch();
+  const { loading, error, user } = useSelector(state => state.user);
+
+  const handleSignup = userData => {
+    dispatch(signupUser(userData));
+  };
+
+  useEffect(() => {
+    if (user) {
+      navigation.replace('Main');
+    }
+  }, [user, navigation]);
 
   return (
     <ScreenWrapper>
