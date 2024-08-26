@@ -99,8 +99,6 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-     
     </ScreenWrapper>
   );
 }
@@ -120,7 +118,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 5,
   },
-
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
@@ -195,18 +192,5 @@ const styles = StyleSheet.create({
   promotionDescription: {
     fontSize: 14,
     color: '#666',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 15,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-  },
-  footerText: {
-    fontSize: 16,
-    color: '#007BFF',
-    marginTop: 5,
   },
 });
