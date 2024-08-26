@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import {useSelector} from 'react-redux';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { useSelector } from 'react-redux';
 import Button from '../../components/button/button';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5 from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function HomeScreen({navigation}) {
+export default function HomeScreen({ navigation }) {
   const user = useSelector(state => state.user.user);
 
   return (
@@ -32,14 +34,14 @@ export default function HomeScreen({navigation}) {
             title="Add a Baby"
             onPress={() => navigation.navigate('Settings')}
             style={styles.button}
-            icon={<Icon name="plus" size={20} color="#fff" />}
+            icon={<FontAwesome name="plus" size={20} color="#fff" />}
           />
           <Button
             title="Profile"
             outlined={true}
             onPress={() => navigation.navigate('Profile')}
-            style={styles.button}
-            icon={<Icon name="user" size={20} color="#EF8D7F" />}
+            style={[styles.button, styles.outlinedButton]}
+            icon={<FontAwesome name="user" size={20} color="#EF8D7F" />}
           />
         </View>
 
@@ -47,25 +49,36 @@ export default function HomeScreen({navigation}) {
         <Text style={styles.sectionTitle}>Featured Content</Text>
         <View style={styles.featuredContent}>
           <TouchableOpacity style={styles.featuredItem}>
-            <Icon name="heartbeat" size={24} color="#EF8D7F" />
-            <Text style={styles.featuredText}>Monitor Baby's Health</Text>
-            <Text style={styles.featuredDescription}>
-              Track sleep patterns, monitor vitals, and get health insights for your baby.
-            </Text>
+            <FontAwesome name="heartbeat" size={24} color="#EF8D7F" />
+            <View style={styles.featuredTextContainer}>
+              <Text style={styles.featuredText}>Monitor Baby's Health</Text>
+              <Text style={styles.featuredDescription}>
+                Track sleep patterns, monitor vitals, and get health insights for
+                your baby.
+              </Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.featuredItem}>
-            <Icon name="microphone" size={24} color="#EF8D7F" />
-            <Text style={styles.featuredText}>Baby's Cry Analyzer</Text>
-            <Text style={styles.featuredDescription}>
-              Use AI to analyze your baby's cry and understand their needs.
-            </Text>
+            <FontAwesome name="microphone" size={24} color="#EF8D7F" />
+            <View style={styles.featuredTextContainer}>
+              <Text style={styles.featuredText}>Baby's Cry Analyzer</Text>
+              <Text style={styles.featuredDescription}>
+                Use AI to analyze your baby's cry and understand their needs.
+              </Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.featuredItem}>
-            <Icon name="lightbulb-o" size={24} color="#EF8D7F" />
-            <Text style={styles.featuredText}>Daily Baby Tips</Text>
-            <Text style={styles.featuredDescription}>
-              Receive daily tips and advice for baby care from experts.
-            </Text>
+            <FontAwesome5
+              name="lightbulb"
+              size={24}
+              color="#EF8D7F"
+            />
+            <View style={styles.featuredTextContainer}>
+              <Text style={styles.featuredText}>Daily Baby Tips</Text>
+              <Text style={styles.featuredDescription}>
+                Receive daily tips and advice for baby care from experts.
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -73,30 +86,21 @@ export default function HomeScreen({navigation}) {
         <Text style={styles.sectionTitle}>Promotions</Text>
         <View style={styles.promotions}>
           <TouchableOpacity style={styles.promotionItem}>
-            <Icon name="gift" size={24} color="#0288D1" />
-            <Text style={styles.promotionText}>Get 50% off on the Baby Cry Analyzer Premium</Text>
-            <Text style={styles.promotionDescription}>
-              Upgrade now and get detailed insights and personalized baby care advice.
-            </Text>
+            <AntDesign name="gift" size={24} color="#0288D1" />
+            <View style={styles.featuredTextContainer}>
+              <Text style={styles.promotionText}>
+                Get 50% off on the Baby Cry Analyzer Premium
+              </Text>
+              <Text style={styles.promotionDescription}>
+                Upgrade now and get detailed insights and personalized baby care
+                advice.
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      {/* Footer Navigation */}
-      <View style={styles.footer}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Icon name="home" size={24} color="#007BFF" />
-          <Text style={styles.footerText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Explore')}>
-          <Icon name="search" size={24} color="#007BFF" />
-          <Text style={styles.footerText}>Explore</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
-          <Icon name="bell" size={24} color="#007BFF" />
-          <Text style={styles.footerText}>Notifications</Text>
-        </TouchableOpacity>
-      </View>
+     
     </ScreenWrapper>
   );
 }
@@ -116,9 +120,7 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 5,
   },
-  content: {
-    flex: 1,
-  },
+
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
@@ -133,6 +135,12 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     marginHorizontal: 5,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  outlinedButton: {
+    borderColor: '#EF8D7F',
+    borderWidth: 2,
   },
   featuredContent: {
     marginBottom: 20,
@@ -140,26 +148,28 @@ const styles = StyleSheet.create({
   featuredItem: {
     backgroundColor: '#fff',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 15,
     marginBottom: 15,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
-    elevation: 3,
+    elevation: 1,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  featuredTextContainer: {
+    marginLeft: 10,
+    flex: 1,
   },
   featuredText: {
     fontSize: 18,
     color: '#333',
-    marginLeft: 10,
     marginBottom: 5,
   },
   featuredDescription: {
     fontSize: 14,
     color: '#666',
-    marginLeft: 10,
   },
   promotions: {
     marginBottom: 20,
@@ -167,26 +177,24 @@ const styles = StyleSheet.create({
   promotionItem: {
     backgroundColor: '#e3f2fd',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 15,
     marginBottom: 15,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
-    elevation: 3,
+    elevation: 1,
     flexDirection: 'row',
     alignItems: 'center',
   },
   promotionText: {
     fontSize: 16,
     color: '#0288D1',
-    marginLeft: 10,
     marginBottom: 5,
   },
   promotionDescription: {
     fontSize: 14,
     color: '#666',
-    marginLeft: 10,
   },
   footer: {
     flexDirection: 'row',
@@ -199,5 +207,6 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 16,
     color: '#007BFF',
+    marginTop: 5,
   },
 });
