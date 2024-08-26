@@ -1,6 +1,7 @@
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 
-export default function Button({ title, onPress, outlined, style, textStyle }) {
+export default function Button({ title, onPress, outlined, style, textStyle, icon }) {
   return (
     <TouchableOpacity
       style={[
@@ -10,15 +11,18 @@ export default function Button({ title, onPress, outlined, style, textStyle }) {
       ]}
       onPress={onPress}
     >
-      <Text
-        style={[
-          styles.buttonText,
-          outlined ? styles.outlinedButtonText : styles.filledButtonText,
-          textStyle,
-        ]}
-      >
-        {title}
-      </Text>
+      <View style={styles.content}>
+        {icon && <View style={styles.iconContainer}>{icon}</View>}
+        <Text
+          style={[
+            styles.buttonText,
+            outlined ? styles.outlinedButtonText : styles.filledButtonText,
+            textStyle,
+          ]}
+        >
+          {title}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -29,6 +33,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    marginRight: 10,
   },
   filledButton: {
     backgroundColor: '#EF8D7F',
@@ -36,7 +49,7 @@ const styles = StyleSheet.create({
   outlinedButton: {
     backgroundColor: '#FFFFFF',
     borderColor: '#EF8D7F',
-    borderWidth: 1, 
+    borderWidth: 1,
   },
   filledButtonText: {
     color: '#FFFFFF',
