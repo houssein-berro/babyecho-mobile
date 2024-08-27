@@ -143,7 +143,7 @@ export default function RecordingScreen({navigation}) {
       <View style={styles.container}>
         <Text style={styles.title}>
           {isRecording ? 'Recording...' : 'Ready to Record'}
-        </Text> 
+        </Text>
         <View style={styles.microphoneContainer}>
           <TouchableOpacity
             onPress={isRecording ? stopRecording : startRecording}
@@ -182,3 +182,83 @@ export default function RecordingScreen({navigation}) {
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f7f8fa',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 40,
+  },
+  microphoneContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  outerCircle: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 5},
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  innerCircle: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: '#FFEBEB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dots: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#FF6B6B',
+  },
+  description: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 40,
+    paddingHorizontal: 20,
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+  button: {
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    marginHorizontal: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 5},
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  cancelButton: {
+    backgroundColor: '#FFB3B3',
+  },
+  stopButton: {
+    backgroundColor: '#FF6B6B',
+  },
+  buttonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
+  },
+});
