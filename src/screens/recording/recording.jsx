@@ -64,6 +64,21 @@ export default function RecordingScreen({navigation}) {
     }
   };
 
+  const startRecording = async () => {
+    try {
+      const result = await audioRecorderPlayer.startRecorder();
+      setIsRecording(true);
+      setDots('');
+      audioRecorderPlayer.addRecordBackListener(e => {
+        setRecordSecs(e.currentPosition);
+        console.log('Recording back', e);
+      });
+      console.log(result);
+    } catch (error) {
+      console.log('Failed to start recording', error);
+    }
+  };
+
 
   useEffect(() => {
     let interval;
