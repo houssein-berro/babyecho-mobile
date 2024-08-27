@@ -1,11 +1,11 @@
 import React from 'react';
 import { Text, Image, StyleSheet } from 'react-native';
-import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
+import OnboardingScreenWrapper from '../../components/screenWrapper/onboardingScreenWrapper';
 import Button from '../../components/button/button';
 
 export default function Onboarding2Screen({ navigation }) {
   return (
-    <ScreenWrapper>
+    <OnboardingScreenWrapper>
       <Text style={styles.title}>Stay Informed Instantly</Text>
       <Image
         source={require('../../assets/public/onboarding2.png')}
@@ -14,15 +14,15 @@ export default function Onboarding2Screen({ navigation }) {
       <Text style={styles.subtitle}>Get alerts when your baby needs attention.</Text>
       <Button
         title="Login"
-        onPress={() => navigation.replace('Login')} // Replace to avoid going back to onboarding
+        onPress={() => navigation.replace('Login')}
       />
       <Button
         title="Signup"
-        onPress={() => navigation.replace('Signup')} // Replace to avoid going back to onboarding
+        onPress={() => navigation.replace('Signup')} 
         outlined={true}
         style={styles.signupButton}
       />
-    </ScreenWrapper>
+    </OnboardingScreenWrapper>
   );
 }
 
