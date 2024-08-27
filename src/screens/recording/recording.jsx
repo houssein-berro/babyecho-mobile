@@ -104,7 +104,16 @@ export default function RecordingScreen({navigation}) {
     }
   };
 
-  
+  const cancelRecording = async () => {
+    try {
+      await audioRecorderPlayer.stopRecorder();
+      setIsRecording(false);
+      setDots('');
+      setRecordSecs(0); // Reset the recording duration
+    } catch (error) {
+      console.log('Failed to cancel recording', error);
+    }
+  };
 
   useEffect(() => {
     let interval;
