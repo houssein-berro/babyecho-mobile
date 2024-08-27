@@ -143,7 +143,7 @@ export default function RecordingScreen({navigation}) {
       <View style={styles.container}>
         <Text style={styles.title}>
           {isRecording ? 'Recording...' : 'Ready to Record'}
-        </Text>
+        </Text> 
         <View style={styles.microphoneContainer}>
           <TouchableOpacity
             onPress={isRecording ? stopRecording : startRecording}
