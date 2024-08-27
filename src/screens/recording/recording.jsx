@@ -222,6 +222,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   dots: {
     fontSize: 24,
     fontWeight: '600',
