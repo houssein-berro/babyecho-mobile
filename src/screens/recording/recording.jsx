@@ -79,6 +79,32 @@ export default function RecordingScreen({navigation}) {
     }
   };
 
+  const stopRecording = async () => {
+    try {
+      const result = await audioRecorderPlayer.stopRecorder();
+      setIsRecording(false);
+      setDots('');
+      audioRecorderPlayer.removeRecordBackListener();
+      console.log('Recording file saved at:', result);
+
+      // Prepare the form data and update the state
+      const newFormData = new FormData();
+      newFormData.append('audioFile', {
+        uri: result,
+        type: 'audio/mp4',
+        name: 'recording.mp4',
+      });
+      newFormData.append('duration', recordSecs); // Include duration if needed
+      newFormData.append('userId', userId); // Include userId from Redux state
+      newFormData.append('babyId', babyId); // Include babyId from Redux state
+
+      setFormData(newFormData);
+    } catch (error) {
+      console.log('Failed to stop recording', error);
+    }
+  };
+
+  
 
   useEffect(() => {
     let interval;
