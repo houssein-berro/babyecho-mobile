@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,16 +7,17 @@ import {
   Alert,
   PermissionsAndroid,
   Platform,
+  Linking,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
-import {useDispatch, useSelector} from 'react-redux';
-import {uploadRecording} from '../../redux/recording/RecordingActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { uploadRecording } from '../../redux/recording/RecordingActions';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
-export default function RecordingScreen({navigation}) {
+export default function RecordingScreen({ navigation }) {
   const [isRecording, setIsRecording] = useState(false);
   const [dots, setDots] = useState('');
   const [recordSecs, setRecordSecs] = useState(0);
@@ -26,11 +27,11 @@ export default function RecordingScreen({navigation}) {
   // Access user data from Redux store
   const user = useSelector(state => state.user.user);
   const userId = user ? user._id : null;
-  const [babyId,setBabyId] = useState();
+  const [babyId, setBabyId] = useState();
 
-  useEffect(()=>{
-    setBabyId(user.babies[0]._id)
-  },[user])
+  useEffect(() => {
+    setBabyId(user.babies[0]._id);
+  }, [user]);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -38,47 +39,76 @@ export default function RecordingScreen({navigation}) {
     }
   }, []);
 
-  const checkAndRequestPermissions = async () => {
-    try {
-      const writeGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-      const readGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
-      const recordGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+ 
+  
 
-      if (!writeGranted || !readGranted || !recordGranted) {
-        await requestPermissions();
-      }
-    } catch (err) {
-      console.warn(err);
-      Alert.alert('Error', 'An error occurred while checking permissions.');
+  const checkAndRequestPermissions = async () => {
+    console.log('Checking permissions...');
+  
+    let writeGranted = false;
+    let readGranted = false;
+    let recordGranted = false;
+  
+    if (Platform.Version >= 33) {  // Android 13+
+      writeGranted = true;  // WRITE_EXTERNAL_STORAGE not needed on Android 13+
+      readGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO);
+    } else {
+      writeGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+      readGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+    }
+    
+    recordGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+  
+    console.log('WRITE_EXTERNAL_STORAGE granted:', writeGranted);
+    console.log('READ_EXTERNAL_STORAGE granted:', readGranted);
+    console.log('RECORD_AUDIO granted:', recordGranted);
+  
+    if (!writeGranted || !readGranted || !recordGranted) {
+      await requestPermissions();
     }
   };
-
+  
   const requestPermissions = async () => {
-    try {
-      const granted = await PermissionsAndroid.requestMultiple([
+    console.log('Requesting permissions...');
+  
+    let permissionsToRequest = [
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+    ];
+  
+    if (Platform.Version >= 33) {  // Android 13+
+      permissionsToRequest.push(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO);
+    } else {
+      permissionsToRequest.push(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-      ]);
-
+      );
+    }
+  
+    try {
+      const granted = await PermissionsAndroid.requestMultiple(permissionsToRequest);
+  
+      console.log('Permissions requested:', granted);
+  
       const writeGranted =
-        granted['android.permission.WRITE_EXTERNAL_STORAGE'] ===
-        PermissionsAndroid.RESULTS.GRANTED;
+        granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] ===
+        PermissionsAndroid.RESULTS.GRANTED || Platform.Version >= 33;
       const readGranted =
-        granted['android.permission.READ_EXTERNAL_STORAGE'] ===
+        granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] ===
+        PermissionsAndroid.RESULTS.GRANTED ||
+        granted[PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO] ===
         PermissionsAndroid.RESULTS.GRANTED;
       const recordGranted =
-        granted['android.permission.RECORD_AUDIO'] ===
+        granted[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] ===
         PermissionsAndroid.RESULTS.GRANTED;
-
+  
       if (!writeGranted || !readGranted || !recordGranted) {
         Alert.alert(
           'Permissions Required',
-          'All permissions need to be granted to use this feature.',
+          'Please enable all permissions in settings to use this feature.',
           [
             {
-              text: 'Try Again',
-              onPress: requestPermissions,
+              text: 'Open Settings',
+              onPress: openSettings,
             },
             {
               text: 'Cancel',
@@ -92,8 +122,30 @@ export default function RecordingScreen({navigation}) {
       Alert.alert('Error', 'An error occurred while requesting permissions.');
     }
   };
-
+  
+  const openSettings = () => {
+    Linking.openSettings().catch(() => {
+      Alert.alert('Error', 'Unable to open settings');
+    });
+  };
   const startRecording = async () => {
+    // Check if permissions are granted before starting the recording
+    const writeGranted =
+      Platform.Version >= 33 ||
+      (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE));
+    const readGranted =
+      Platform.Version >= 33 ||
+      (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE)) ||
+      (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO));
+    const recordGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+  
+    if (!writeGranted || !readGranted || !recordGranted) {
+      console.log('Permissions are not granted, requesting permissions again...');
+      await requestPermissions();
+      return;
+    }
+  
+    // If permissions are granted, proceed with recording
     try {
       const result = await audioRecorderPlayer.startRecorder();
       setIsRecording(true);
@@ -107,7 +159,7 @@ export default function RecordingScreen({navigation}) {
       console.log('Failed to start recording', error);
     }
   };
-
+  
   const stopRecording = async () => {
     try {
       const result = await audioRecorderPlayer.stopRecorder();
@@ -237,7 +289,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 5},
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 5,
@@ -274,7 +326,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     marginHorizontal: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 5},
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 5,
