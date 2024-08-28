@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { Text } from 'react-native';
+import React from 'react';
+import { Text, Animated, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../../screens/home/home';
 import RecordingScreen from '../../screens/recording/recording';
-// import DetailsScreen from '../../screens/details/details';  // Assuming you have a DetailsScreen
+import AddBabyScreen from '../../screens/addBaby/addBabyScreen';
 import CustomHeader from '../../components/customHeader/customHeader';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -21,13 +21,6 @@ function HomeStack() {
           header: () => <CustomHeader title="Home" />,
         }}
       />
-      {/* <Stack.Screen
-        name="Details"
-        component={DetailsScreen}
-        options={{
-          header: () => <CustomHeader title="Details" />,
-        }}
-      /> */}
     </Stack.Navigator>
   );
 }
@@ -46,35 +39,85 @@ function RecordingStack() {
   );
 }
 
+function BabyStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="AddBaby"
+        component={AddBabyScreen}
+        options={{
+          header: () => <CustomHeader title="Add Baby" />,
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function TabBarIcon({ name, color, size, focused }) {
+  const scaleValue = new Animated.Value(focused ? 1.2 : 1);
+
+  React.useEffect(() => {
+    Animated.spring(scaleValue, {
+      toValue: focused ? 1.2 : 1,
+      friction: 4,
+      useNativeDriver: true,
+    }).start();
+  }, [focused]);
+
+  return (
+    <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+      <FontAwesome name={name} size={size} color={color} />
+    </Animated.View>
+  );
+}
+
 export default function MainTabNavigator() {
   return (
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ color, size, focused }) => {
           let iconName;
 
           if (route.name === 'Home') {
             iconName = 'home';
           } else if (route.name === 'Recording') {
             iconName = 'microphone';
-          } else if (route.name === 'Profile') {
-            iconName = 'user';
+          } else if (route.name === 'Babies') {
+            iconName = 'plus';
           }
 
-          return <FontAwesome name={iconName} size={size} color={color} />;
+          return (
+            <TabBarIcon
+              name={iconName}
+              color={color}
+              size={size}
+              focused={focused}
+            />
+          );
         },
-        tabBarLabel: ({ focused }) => {
-          return focused ? (
-            <Text style={{ fontSize: 12, color: focused ? '#FF6B6B' : 'gray' }}>
+        tabBarLabel: ({ focused }) => (
+          focused ? (
+            <Text style={{ fontSize: 12, color: '#FF6B6B' }}>
               {route.name}
             </Text>
-          ) : null;
-        },
+          ) : null
+        ),
       })}
       tabBarOptions={{
         activeTintColor: '#FF6B6B',
         inactiveTintColor: 'gray',
+        style: {
+          backgroundColor: '#f7f8fa',
+          borderTopWidth: 0,
+          elevation: 5,
+        },
+        labelStyle: {
+          fontSize: 12,
+        },
+        tabStyle: {
+          paddingVertical: 5,
+        },
       }}
     >
       <Tab.Screen
@@ -87,11 +130,11 @@ export default function MainTabNavigator() {
         component={RecordingStack}
         options={{ headerShown: false }}
       />
-      {/* <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}  // Assuming you have a ProfileScreen
-        options={{ tabBarLabel: 'Profile' }}
-      /> */}
+      <Tab.Screen
+        name="Babies"
+        component={BabyStack}
+        options={{  headerShown: false }}
+      />
     </Tab.Navigator>
   );
 }
