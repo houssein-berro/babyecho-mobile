@@ -51,3 +51,32 @@ export default function AddBabyScreen({ navigation }) {
     </ScreenWrapper>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#F7F8FA',
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  input: {
+    width: '100%',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 10,
+    backgroundColor: '#FAFAFA',
+    marginBottom: 20,
+    fontSize: 16,
+    color: '#333',
+  },
+
+});
