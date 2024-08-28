@@ -6,7 +6,20 @@ import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import Button from '../../components/button/button';
 
 export default function AddBabyScreen({ navigation }) {
-  
+  const [name, setName] = useState('');
+  const [birthdate, setBirthdate] = useState('');
+  const [gender, setGender] = useState('');
+  const dispatch = useDispatch();
+  const user = useSelector(state => state.user.user);
+
+  const handleAddBaby = () => {
+    if (!name || !birthdate || !gender) {
+      Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+    dispatch(addBabyToUser(user._id, { name, birthdate, gender }));
+    navigation.replace('Main');
+  };
 
   return (
     <ScreenWrapper>
