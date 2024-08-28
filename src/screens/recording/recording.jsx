@@ -26,13 +26,32 @@ export default function RecordingScreen({navigation}) {
   // Access user data from Redux store
   const user = useSelector(state => state.user.user);
   const userId = user ? user._id : null;
-  const babyId = user ? user.babies[0]._id : null;
+  const [babyId,setBabyId] = useState();
+
+  useEffect(()=>{
+    setBabyId(user.babies[0]._id)
+  },[user])
 
   useEffect(() => {
     if (Platform.OS === 'android') {
-      requestPermissions();
+      checkAndRequestPermissions();
     }
   }, []);
+
+  const checkAndRequestPermissions = async () => {
+    try {
+      const writeGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+      const readGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+      const recordGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+
+      if (!writeGranted || !readGranted || !recordGranted) {
+        await requestPermissions();
+      }
+    } catch (err) {
+      console.warn(err);
+      Alert.alert('Error', 'An error occurred while checking permissions.');
+    }
+  };
 
   const requestPermissions = async () => {
     try {
@@ -56,6 +75,16 @@ export default function RecordingScreen({navigation}) {
         Alert.alert(
           'Permissions Required',
           'All permissions need to be granted to use this feature.',
+          [
+            {
+              text: 'Try Again',
+              onPress: requestPermissions,
+            },
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+          ]
         );
       }
     } catch (err) {
@@ -137,7 +166,6 @@ export default function RecordingScreen({navigation}) {
     }
   }, [formData, dispatch]);
 
-  console.log('user', user, user.babies);
   return (
     <ScreenWrapper>
       <View style={styles.container}>
