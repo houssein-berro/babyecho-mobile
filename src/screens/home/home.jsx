@@ -6,14 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 import Button from '../../components/button/button';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({navigation}) {
   const user = useSelector(state => state.user.user);
 
   return (
@@ -27,7 +27,7 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Scrollable Content */}
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Navigation Links */}
         <View style={styles.buttonGroup}>
           <Button
@@ -53,8 +53,8 @@ export default function HomeScreen({ navigation }) {
             <View style={styles.featuredTextContainer}>
               <Text style={styles.featuredText}>Monitor Baby's Health</Text>
               <Text style={styles.featuredDescription}>
-                Track sleep patterns, monitor vitals, and get health insights for
-                your baby.
+                Track sleep patterns, monitor vitals, and get health insights
+                for your baby.
               </Text>
             </View>
           </TouchableOpacity>
@@ -68,11 +68,7 @@ export default function HomeScreen({ navigation }) {
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.featuredItem}>
-            <FontAwesome5
-              name="lightbulb"
-              size={24}
-              color="#EF8D7F"
-            />
+            <FontAwesome5 name="lightbulb" size={24} color="#EF8D7F" />
             <View style={styles.featuredTextContainer}>
               <Text style={styles.featuredText}>Daily Baby Tips</Text>
               <Text style={styles.featuredDescription}>
@@ -148,7 +144,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginBottom: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 1,
@@ -177,7 +173,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginBottom: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 1,
