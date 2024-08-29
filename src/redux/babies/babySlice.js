@@ -14,7 +14,11 @@ const babySlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-  
+    addBabySuccess(state, action) {
+      state.babies.push(action.payload);
+      state.loading = false;
+    },
+
   },
 });
 
