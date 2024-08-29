@@ -40,22 +40,7 @@ const authSlice = createSlice({
     loadUser(state, action) {
       state.user = action.payload;
     },
-    addBabyStart(state) {
-      state.loading = true;
-      state.error = null;
-    },
-    addBabySuccess(state, action) {
-      if (state.user && state.user.babies) {
-        state.user.babies.push(action.payload);
-      } else if (state.user) {
-        state.user.babies = [action.payload];
-      }
-      state.loading = false;
-    },
-    addBabyFailure(state, action) {
-      state.error = action.payload;
-      state.loading = false;
-    }
+
   }
 });
 
