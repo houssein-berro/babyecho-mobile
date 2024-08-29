@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,39 +8,30 @@ import {
   Switch,
   KeyboardAvoidingView,
   Platform,
+  Animated,
+  FlatList,
+  TouchableOpacity,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-// import { addBabyToUser } from '../../redux/baby/babyActions'; // Uncomment when action is available
+import { addBabyToUser } from '../../redux/auth/authActions';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import ButtonComponent from '../../components/button/button';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-export default function AddBabyScreen({ navigation }) {
+export default function BabyScreen({ navigation }) {
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState('');
   const [isMale, setIsMale] = useState(true);
+  const [slideAnim] = useState(new Animated.Value(0)); // Slide animation for the form
+  const [formOpacity] = useState(new Animated.Value(0)); // Opacity animation for the form
+  const [showAddBaby, setShowAddBaby] = useState(false); // Toggle for add baby form
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.user);
 
-  const handleAddBaby = () => {
-    const gender = isMale ? 'Male' : 'Female';
-    if (!name || !birthdate || !gender) {
-      Alert.alert('Error', 'Please fill all fields');
-      return;
-    }
 
-    if (!isValidDate(birthdate)) {
-      Alert.alert('Error', 'Please enter a valid birthdate in the format YYYY-MM-DD.');
-      return;
-    }
-
-    // Uncomment when action is available
-    // dispatch(addBabyToUser(user._id, { name, birthdate, gender }));
-    navigation.replace('Main');
-  };
 
   const handleBirthdateChange = (text) => {
-    const cleanedText = text.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+    const cleanedText = text.replace(/[^0-9]/g, '');
     let formattedText = '';
 
     if (cleanedText.length <= 4) {
@@ -64,61 +55,108 @@ export default function AddBabyScreen({ navigation }) {
     return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
   };
 
+  const renderBabyItem = ({ item }) => (
+    <View style={[styles.babyCard, item.gender === 'Male' ? styles.maleCard : styles.femaleCard]}>
+      <FontAwesome
+        name={item.gender === 'Male' ? 'male' : 'female'}
+        size={40}
+        color="#fff"
+        style={styles.genderIcon}
+      />
+      <View style={styles.babyInfo}>
+        <Text style={styles.babyName}>{item.name}</Text>
+        <Text style={styles.babyDetails}>Birthdate: {item.birthdate}</Text>
+        <Text style={styles.babyDetails}>Gender: {item.gender}</Text>
+      </View>
+    </View>
+  );
+
   return (
     <ScreenWrapper>
       <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
       >
-        <Text style={styles.title}>Add Your Baby</Text>
-
-        <Text style={styles.label}>Name</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter baby's name"
-            value={name}
-            onChangeText={setName}
-            placeholderTextColor="#9E9E9E"
+        <View style={styles.container}>
+          <Text style={styles.screenTitle}>Your Babies</Text>
+          <FlatList
+            data={user.babies}
+            renderItem={renderBabyItem}
+            keyExtractor={(item, index) => index.toString()}
+            ListEmptyComponent={<Text style={styles.noBabiesText}>No babies added yet.</Text>}
+            contentContainerStyle={styles.babiesListContainer}
           />
-          <FontAwesome name="user" size={20} color="#9E9E9E" style={styles.icon} />
-        </View>
 
-        <Text style={styles.label}>Birthdate</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            value={birthdate}
-            onChangeText={handleBirthdateChange}
-            placeholder="YYYY-MM-DD"
-            maxLength={10}
-            keyboardType="numeric"
-            placeholderTextColor="#9E9E9E"
-          />
-          <FontAwesome name="calendar" size={20} color="#9E9E9E" style={styles.icon} />
-        </View>
+          <TouchableOpacity onPress={() => setShowAddBaby(!showAddBaby)} style={styles.toggleButton}>
+            <Text style={styles.toggleButtonText}>
+              {showAddBaby ? 'Cancel' : 'Add New Baby'}
+            </Text>
+            <FontAwesome name={showAddBaby ? 'chevron-up' : 'chevron-down'} size={18} color="#ffffff" />
+          </TouchableOpacity>
 
-        <Text style={styles.label}>Gender</Text>
-        <View style={styles.switchContainer}>
-          <View style={styles.switchLabelContainer}>
-            <FontAwesome name="male" size={24} color={isMale ? '#61dbfb' : '#ccc'} />
-            <Text style={[styles.switchLabel, { color: isMale ? '#61dbfb' : '#ccc' }]}>Boy</Text>
-          </View>
-          <Switch
-            value={isMale}
-            onValueChange={setIsMale}
-            thumbColor={isMale ? '#61dbfb' : '#f7b7d2'}
-            trackColor={{ false: '#f7b7d2', true: '#61dbfb' }}
-            style={styles.switch}
-          />
-          <View style={styles.switchLabelContainer}>
-            <FontAwesome name="female" size={24} color={!isMale ? '#f7b7d2' : '#ccc'} />
-            <Text style={[styles.switchLabel, { color: !isMale ? '#f7b7d2' : '#ccc' }]}>Girl</Text>
-          </View>
-        </View>
+          {showAddBaby && (
+            <Animated.View
+              style={[
+                styles.formContainer,
+                {
+                  opacity: formOpacity,
+                  transform: [
+                    {
+                      translateY: slideAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [300, 0],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <Text style={styles.formTitle}>Add Your Baby</Text>
 
-        <ButtonComponent title="Add Baby" onPress={handleAddBaby} />
+              <Text style={styles.label}>Name</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter baby's name"
+                  value={name}
+                  onChangeText={setName}
+                  placeholderTextColor="#9E9E9E"
+                />
+                <FontAwesome name="user" size={20} color="#9E9E9E" style={styles.icon} />
+              </View>
+
+              <Text style={styles.label}>Birthdate</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  value={birthdate}
+                  onChangeText={handleBirthdateChange}
+                  placeholder="YYYY-MM-DD"
+                  maxLength={10}
+                  keyboardType="numeric"
+                  placeholderTextColor="#9E9E9E"
+                />
+                <FontAwesome name="calendar" size={20} color="#9E9E9E" style={styles.icon} />
+              </View>
+
+              <Text style={styles.label}>Gender</Text>
+              <View style={styles.switchContainer}>
+                <View style={styles.switchLabelContainer}>
+                  <FontAwesome name="male" size={24} color={isMale ? '#61dbfb' : '#ccc'} />
+                  <Text style={[styles.switchLabel, { color: isMale ? '#61dbfb' : '#ccc' }]}>Boy</Text>
+                </View>
+              
+                <View style={styles.switchLabelContainer}>
+                  <FontAwesome name="female" size={24} color={!isMale ? '#f7b7d2' : '#ccc'} />
+                  <Text style={[styles.switchLabel, { color: !isMale ? '#f7b7d2' : '#ccc' }]}>Girl</Text>
+                </View>
+              </View>
+
+              <ButtonComponent title="Add Baby" onPress={handleAddBaby} />
+            </Animated.View>
+          )}
+        </View>
       </KeyboardAvoidingView>
     </ScreenWrapper>
   );
@@ -127,15 +165,89 @@ export default function AddBabyScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 20,
+    justifyContent: 'flex-start',
+    paddingBottom:40
   },
-  title: {
-    fontSize: 26,
+  screenTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 30,
+    marginBottom: 20,
     textAlign: 'center',
+  },
+  toggleButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#EF8D7F',
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  toggleButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    marginRight: 5,
+  },
+  babiesListContainer: {
+    paddingBottom: 20,
+  },
+  babyCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  maleCard: {
+    backgroundColor: '#4A90E2',
+  },
+  femaleCard: {
+    backgroundColor: '#E94E77',
+  },
+  genderIcon: {
+    marginRight: 15,
+  },
+  babyInfo: {
+    flex: 1,
+  },
+  babyName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  babyDetails: {
+    fontSize: 14,
+    color: '#fff',
+  },
+  noBabiesText: {
+    textAlign: 'center',
+    color: '#777',
+    marginTop: 20,
+  },
+  formContainer: {
+    backgroundColor: '#f7f8fa',
+    padding: 20,
+    borderRadius: 15,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  formTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#424242',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
