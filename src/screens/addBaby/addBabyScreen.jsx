@@ -28,7 +28,21 @@ export default function BabyScreen({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.user);
 
+  useEffect(() => {
+    Animated.timing(slideAnim, {
+      toValue: showAddBaby ? 1 : 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
 
+    Animated.timing(formOpacity, {
+      toValue: showAddBaby ? 1 : 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, [showAddBaby, slideAnim, formOpacity]);
+
+ 
 
   const handleBirthdateChange = (text) => {
     const cleanedText = text.replace(/[^0-9]/g, '');
@@ -152,7 +166,7 @@ export default function BabyScreen({ navigation }) {
                   thumbColor={isMale ? '#61dbfb' : '#f7b7d2'}
                   trackColor={{ false: '#f7b7d2', true: '#61dbfb' }}
                   style={styles.switch}
-                /> 
+                />
                 <View style={styles.switchLabelContainer}>
                   <FontAwesome name="female" size={24} color={!isMale ? '#f7b7d2' : '#ccc'} />
                   <Text style={[styles.switchLabel, { color: !isMale ? '#f7b7d2' : '#ccc' }]}>Girl</Text>
