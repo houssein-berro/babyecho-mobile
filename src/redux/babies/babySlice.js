@@ -25,5 +25,5 @@ const babySlice = createSlice({
   },
 });
 
-export const { addBabyStart, addBabySuccess, addBabyFailure } = babySlice.actions;
+export const { addBabyStart, addBabySuccess, addBabyFailure } = babySlice.actions; 
 export default babySlice.reducer;
