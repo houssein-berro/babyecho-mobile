@@ -18,7 +18,10 @@ const babySlice = createSlice({
       state.babies.push(action.payload);
       state.loading = false;
     },
-
+    addBabyFailure(state, action) {
+      state.error = action.payload;
+      state.loading = false;
+    },
   },
 });
 
