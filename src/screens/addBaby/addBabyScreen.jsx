@@ -42,7 +42,21 @@ export default function BabyScreen({ navigation }) {
     }).start();
   }, [showAddBaby, slideAnim, formOpacity]);
 
- 
+  const handleAddBaby = () => {
+    const gender = isMale ? 'Male' : 'Female';
+    if (!name || !birthdate || !gender) {
+      Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+
+    if (!isValidDate(birthdate)) {
+      Alert.alert('Error', 'Please enter a valid birthdate in the format YYYY-MM-DD.');
+      return;
+    }
+
+    dispatch(addBabyToUser(user._id, { name, birthdate, gender }));
+    setShowAddBaby(false); // Hide the form after adding a baby
+  };
 
   const handleBirthdateChange = (text) => {
     const cleanedText = text.replace(/[^0-9]/g, '');
