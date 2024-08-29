@@ -146,7 +146,13 @@ export default function BabyScreen({ navigation }) {
                   <FontAwesome name="male" size={24} color={isMale ? '#61dbfb' : '#ccc'} />
                   <Text style={[styles.switchLabel, { color: isMale ? '#61dbfb' : '#ccc' }]}>Boy</Text>
                 </View>
-              
+                <Switch
+                  value={isMale}
+                  onValueChange={setIsMale}
+                  thumbColor={isMale ? '#61dbfb' : '#f7b7d2'}
+                  trackColor={{ false: '#f7b7d2', true: '#61dbfb' }}
+                  style={styles.switch}
+                />
                 <View style={styles.switchLabelContainer}>
                   <FontAwesome name="female" size={24} color={!isMale ? '#f7b7d2' : '#ccc'} />
                   <Text style={[styles.switchLabel, { color: !isMale ? '#f7b7d2' : '#ccc' }]}>Girl</Text>

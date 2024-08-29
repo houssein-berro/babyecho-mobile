@@ -30,7 +30,7 @@ export default function RecordingScreen({ navigation }) {
   const [babyId, setBabyId] = useState();
 
   useEffect(() => {
-    setBabyId(user.babies[0]._id);
+    setBabyId(user?.babies[0]._id);
   }, [user]);
 
   useEffect(() => {
