@@ -31,7 +31,7 @@ export default function RecordingScreen({ navigation }) {
 
   useEffect(() => {
     setBabyId(user?.babies[0]._id);
-  }, [user]);
+  }, [user]); 
 
   useEffect(() => {
     if (Platform.OS === 'android') {
