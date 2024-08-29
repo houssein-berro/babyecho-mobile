@@ -53,9 +53,7 @@ export const {
   signupFailure, 
   logout, 
   loadUser,
-  addBabyStart,
-  addBabySuccess,
-  addBabyFailure 
+
 } = authSlice.actions;
 
 export default authSlice.reducer;
