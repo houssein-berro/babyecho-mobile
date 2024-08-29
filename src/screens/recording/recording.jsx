@@ -22,6 +22,7 @@ export default function RecordingScreen({ navigation }) {
   const [dots, setDots] = useState('');
   const [recordSecs, setRecordSecs] = useState(0);
   const [formData, setFormData] = useState(null);
+  const [recordingStopped, setRecordingStopped] = useState(false); // New state to track if recording has stopped
   const dispatch = useDispatch();
 
   // Access user data from Redux store
@@ -31,7 +32,7 @@ export default function RecordingScreen({ navigation }) {
 
   useEffect(() => {
     setBabyId(user?.babies[0]._id);
-  }, [user]); 
+  }, [user]);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -39,43 +40,40 @@ export default function RecordingScreen({ navigation }) {
     }
   }, []);
 
- 
-  
-
   const checkAndRequestPermissions = async () => {
     console.log('Checking permissions...');
-  
+
     let writeGranted = false;
     let readGranted = false;
     let recordGranted = false;
-  
-    if (Platform.Version >= 33) {  // Android 13+
-      writeGranted = true;  // WRITE_EXTERNAL_STORAGE not needed on Android 13+
+
+    if (Platform.Version >= 33) { // Android 13+
+      writeGranted = true; // WRITE_EXTERNAL_STORAGE not needed on Android 13+
       readGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO);
     } else {
       writeGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
       readGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
     }
-    
+
     recordGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
-  
+
     console.log('WRITE_EXTERNAL_STORAGE granted:', writeGranted);
     console.log('READ_EXTERNAL_STORAGE granted:', readGranted);
     console.log('RECORD_AUDIO granted:', recordGranted);
-  
+
     if (!writeGranted || !readGranted || !recordGranted) {
       await requestPermissions();
     }
   };
-  
+
   const requestPermissions = async () => {
     console.log('Requesting permissions...');
-  
+
     let permissionsToRequest = [
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
     ];
-  
-    if (Platform.Version >= 33) {  // Android 13+
+
+    if (Platform.Version >= 33) { // Android 13+
       permissionsToRequest.push(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO);
     } else {
       permissionsToRequest.push(
@@ -83,12 +81,12 @@ export default function RecordingScreen({ navigation }) {
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
       );
     }
-  
+
     try {
       const granted = await PermissionsAndroid.requestMultiple(permissionsToRequest);
-  
+
       console.log('Permissions requested:', granted);
-  
+
       const writeGranted =
         granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] ===
         PermissionsAndroid.RESULTS.GRANTED || Platform.Version >= 33;
@@ -100,7 +98,7 @@ export default function RecordingScreen({ navigation }) {
       const recordGranted =
         granted[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] ===
         PermissionsAndroid.RESULTS.GRANTED;
-  
+
       if (!writeGranted || !readGranted || !recordGranted) {
         Alert.alert(
           'Permissions Required',
@@ -122,12 +120,13 @@ export default function RecordingScreen({ navigation }) {
       Alert.alert('Error', 'An error occurred while requesting permissions.');
     }
   };
-  
+
   const openSettings = () => {
     Linking.openSettings().catch(() => {
       Alert.alert('Error', 'Unable to open settings');
     });
   };
+
   const startRecording = async () => {
     // Check if permissions are granted before starting the recording
     const writeGranted =
@@ -138,18 +137,19 @@ export default function RecordingScreen({ navigation }) {
       (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE)) ||
       (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO));
     const recordGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
-  
+
     if (!writeGranted || !readGranted || !recordGranted) {
       console.log('Permissions are not granted, requesting permissions again...');
       await requestPermissions();
       return;
     }
-  
+
     // If permissions are granted, proceed with recording
     try {
       const result = await audioRecorderPlayer.startRecorder();
       setIsRecording(true);
       setDots('');
+      setRecordingStopped(false); // Reset the recording stopped state
       audioRecorderPlayer.addRecordBackListener(e => {
         setRecordSecs(e.currentPosition);
         console.log('Recording back', e);
@@ -159,12 +159,13 @@ export default function RecordingScreen({ navigation }) {
       console.log('Failed to start recording', error);
     }
   };
-  
+
   const stopRecording = async () => {
     try {
       const result = await audioRecorderPlayer.stopRecorder();
       setIsRecording(false);
       setDots('');
+      setRecordingStopped(true); // Set recording stopped state to true
       audioRecorderPlayer.removeRecordBackListener();
       console.log('Recording file saved at:', result);
 
@@ -175,9 +176,9 @@ export default function RecordingScreen({ navigation }) {
         type: 'audio/mp4',
         name: 'recording.mp4',
       });
-      newFormData.append('duration', recordSecs); // Include duration if needed
-      newFormData.append('userId', userId); // Include userId from Redux state
-      newFormData.append('babyId', babyId); // Include babyId from Redux state
+      newFormData.append('duration', recordSecs);
+      newFormData.append('userId', userId);
+      newFormData.append('babyId', babyId);
 
       setFormData(newFormData);
     } catch (error) {
@@ -191,6 +192,7 @@ export default function RecordingScreen({ navigation }) {
       setIsRecording(false);
       setDots('');
       setRecordSecs(0); // Reset the recording duration
+      setRecordingStopped(false); // Reset the recording stopped state
     } catch (error) {
       console.log('Failed to cancel recording', error);
     }
@@ -208,12 +210,9 @@ export default function RecordingScreen({ navigation }) {
     return () => clearInterval(interval);
   }, [isRecording]);
 
-  // Log formData whenever it changes
   useEffect(() => {
     if (formData) {
       console.log('Form Data Updated:', formData);
-
-      // Dispatch uploadRecording action
       dispatch(uploadRecording(formData));
     }
   }, [formData, dispatch]);
@@ -237,10 +236,12 @@ export default function RecordingScreen({ navigation }) {
             </View>
           </TouchableOpacity>
         </View>
-        <Text style={styles.description}>
-          Your baby’s sounds are being analyzed. Stay close and receive
-          real-time feedback.
-        </Text>
+        {recordingStopped && (
+          <Text style={styles.description}>
+            Your baby’s sounds are being analyzed. Stay close and receive
+            real-time feedback.
+          </Text>
+        )}
         <View style={styles.buttonGroup}>
           {isRecording && (
             <TouchableOpacity
@@ -301,7 +302,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   dots: {
     fontSize: 24,
     fontWeight: '600',
