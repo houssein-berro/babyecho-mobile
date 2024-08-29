@@ -98,15 +98,17 @@ export default function MainTabNavigator() {
         },
         tabBarLabel: ({ focused }) => (
           focused ? (
-            <Text style={{ fontSize: 12, color: '#FF6B6B' }}>
+            <Text style={{ fontSize: 12, color: '#EF8D7F' }}>
               {route.name}
             </Text>
           ) : null
         ),
       })}
       tabBarOptions={{
-        activeTintColor: '#FF6B6B',
+        activeTintColor: '#EF8D7F',
         inactiveTintColor: 'gray',
+        keyboardHidesTabBar: true,
+
         style: {
           backgroundColor: '#f7f8fa',
           borderTopWidth: 0,
