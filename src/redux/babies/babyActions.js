@@ -2,7 +2,9 @@ import axios from 'axios';
 import { addBabyStart, addBabySuccess, addBabyFailure } from './babySlice';
 import { BACKEND_URL } from '@env';
 
-export const addBabyToUser = (userId, babyData) => async (dispatch) => {    
+export const addBabyToUser = (userId, babyData) => async (dispatch) => {
+    console.log(userId);
+    console.log(babyData);    
     dispatch(addBabyStart());
     try {
       const response = await axios.post(`${BACKEND_URL}/api/users/add-baby/${userId}`, babyData);
