@@ -31,8 +31,8 @@ export default function HomeScreen({navigation}) {
         {/* Navigation Links */}
         <View style={styles.buttonGroup}>
           <Button
-            title="Add a Baby"
-            onPress={() => navigation.navigate('Settings')}
+            title="Add member"
+            onPress={() => navigation.navigate('Babies')}
             style={styles.button}
             icon={<FontAwesome name="plus" size={20} color="#fff" />}
           />
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 15,
     color: '#333',
-  },
+  }, 
   buttonGroup: {
     flexDirection: 'row',
     justifyContent: 'space-between',
