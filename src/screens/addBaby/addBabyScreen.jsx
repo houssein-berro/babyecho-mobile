@@ -22,9 +22,9 @@ export default function BabyScreen({ navigation }) {
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState('');
   const [isMale, setIsMale] = useState(true);
-  const [slideAnim] = useState(new Animated.Value(0)); // Slide animation for the form
-  const [formOpacity] = useState(new Animated.Value(0)); // Opacity animation for the form
-  const [showAddBaby, setShowAddBaby] = useState(false); // Toggle for add baby form
+  const [slideAnim] = useState(new Animated.Value(0)); 
+  const [formOpacity] = useState(new Animated.Value(0));
+  const [showAddBaby, setShowAddBaby] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.user);
 
@@ -55,7 +55,7 @@ export default function BabyScreen({ navigation }) {
     }
 
     dispatch(addBabyToUser(user._id, { name, birthdate, gender }));
-    setShowAddBaby(false); // Hide the form after adding a baby
+    setShowAddBaby(false); 
   };
 
   const handleBirthdateChange = (text) => {
