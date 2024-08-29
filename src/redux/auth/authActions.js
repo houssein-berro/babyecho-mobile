@@ -56,17 +56,3 @@ export const validateToken = () => async (dispatch) => {
   }
 };
 
-// Add baby action creator
-export const addBabyToUser = (userId, babyData) => async (dispatch) => {
-  console.log(userId);
-  console.log(babyData);
-  
-  
-  dispatch(addBabyStart());
-  try {
-    const response = await axios.post(`${BACKEND_URL}/api/users/add-baby/${userId}`, babyData);
-    dispatch(addBabySuccess(response.data));
-  } catch (error) {
-    dispatch(addBabyFailure(error.response?.data?.message || error.message || "Failed to add baby"));
-  }
-};
