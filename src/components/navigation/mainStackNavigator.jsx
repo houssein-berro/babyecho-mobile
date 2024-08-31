@@ -2,12 +2,12 @@ import React from 'react';
 import { Text, Animated, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen from '../../screens/home/home';
-import RecordingScreen from '../../screens/recording/recording';
+import HomeScreen from '../../screens/home/homeScreen';
+import RecordingScreen from '../../screens/recording/recordingScreen';
 import AddBabyScreen from '../../screens/addBaby/addBabyScreen';
 import CustomHeader from '../../components/customHeader/customHeader';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import TipsScreen from '../../screens/tips/tips';
+import TipsScreen from '../../screens/tips/tipsScreen';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 const Tab = createBottomTabNavigator();
@@ -92,7 +92,7 @@ export default function MainTabNavigator() {
           } else if (route.name === 'Babies') {
             iconName = 'plus';
           } else if (route.name === 'Tips') {
-            iconName = 'lightbulb'; // FontAwesome5 icon name
+            iconName = 'lightbulb';
           }
 
           return (
