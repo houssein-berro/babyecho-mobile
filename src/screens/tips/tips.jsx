@@ -103,7 +103,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius:  8,
   },
-
+  titleWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  icon: {
+    marginRight: 10,
+  },
   accordionTitle: {
     fontSize: 18,
     fontWeight: '500',
