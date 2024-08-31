@@ -7,6 +7,8 @@ import RecordingScreen from '../../screens/recording/recording';
 import AddBabyScreen from '../../screens/addBaby/addBabyScreen';
 import CustomHeader from '../../components/customHeader/customHeader';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import TipsScreen from '../../screens/tips/tips';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -66,7 +68,11 @@ function TabBarIcon({ name, color, size, focused }) {
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-      <FontAwesome name={name} size={size} color={color} />
+      {name === 'lightbulb' ? (
+        <FontAwesome5 name={name} size={size} color={color} />
+      ) : (
+        <FontAwesome name={name} size={size} color={color} />
+      )}
     </Animated.View>
   );
 }
@@ -85,6 +91,8 @@ export default function MainTabNavigator() {
             iconName = 'microphone';
           } else if (route.name === 'Babies') {
             iconName = 'plus';
+          } else if (route.name === 'Tips') {
+            iconName = 'lightbulb'; // FontAwesome5 icon name
           }
 
           return (
@@ -118,7 +126,7 @@ export default function MainTabNavigator() {
           fontSize: 12,
         },
         tabStyle: {
-          paddingVertical: 5,
+          paddingVertical: 3,
         },
       }}
     >
@@ -133,9 +141,14 @@ export default function MainTabNavigator() {
         options={{ headerShown: false }}
       />
       <Tab.Screen
+        name="Tips"
+        component={TipsScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
         name="Babies"
         component={BabyStack}
-        options={{  headerShown: false }}
+        options={{ headerShown: false }}
       />
     </Tab.Navigator>
   );
