@@ -22,3 +22,17 @@ export default function MoonAndStarsSpinner() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  moon: {
+    position: 'absolute',
+  },
+  star: {
+    position: 'absolute',
+  },
+});
