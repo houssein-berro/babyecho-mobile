@@ -53,6 +53,7 @@ export default function AppContent() {
           component={SignupScreen}
           options={{ headerShown: false }}
         />
+        
         <Stack.Screen
           name="Main"
           component={MainStackNavigator}
