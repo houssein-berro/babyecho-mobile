@@ -77,3 +77,48 @@ export default function ParentingTipsScreen() {
   );
 }
 
+const styles = StyleSheet.create({
+
+  container: {
+    height:'100%',
+    padding: 40,
+    backgroundColor: '#fff',
+  },
+  accordionContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    marginBottom: 15,
+    padding: 15,
+    shadowColor: '#2D3748',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  accordionTitleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderRadius:  8,
+  },
+
+  accordionTitle: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#4A5568',
+    fontFamily: 'Inter-Medium',
+  },
+  accordionContent: {
+    padding: 10,
+    backgroundColor: '#EDF2F7',
+    borderRadius: 8,
+  },
+  accordionText: {
+    fontSize: 16,
+    color: '#2D3748',
+    lineHeight: 24,
+    fontFamily: 'Inter-Regular',
+  },
+});
