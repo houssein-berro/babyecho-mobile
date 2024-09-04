@@ -373,22 +373,22 @@ const styles = StyleSheet.create({
   disabled: {
     // backgroundColor: '#ccc',
   },
-  // predictionContainer: {
-  //   marginTop: 20,
-  //   padding: 20,
-  //   backgroundColor: '#f7f7f7',
-  //   borderRadius: 10,
-  //   width: '100%',
-  //   alignItems: 'center',
-  // },
-  // predictionTitle: {
-  //   fontSize: 20,
-  //   fontWeight: 'bold',
-  //   color: '#333',
-  //   marginBottom: 10,
-  // },
-  // predictionText: {
-  //   fontSize: 16,
-  //   color: '#666',
-  // },
+  predictionContainer: {
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: '#f7f7f7',
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  predictionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+  },
+  predictionText: {
+    fontSize: 16,
+    color: '#666',
+  },
 });
