@@ -28,3 +28,29 @@ export default function ConnectedDevicesScreen({navigation}) {
       <Text style={styles.deviceText}>{item.name}</Text>
     </View>
   );
+
+  return (
+    <ScreenWrapper>
+      {devices.length === 0 ? (
+        <View style={styles.emptyStateContainer}>
+          <View style={styles.deviceCard}>
+            <Text style={styles.deviceText}>First Device...</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate('AddDeviceScreen')}>
+            <Text style={styles.addButtonText}>Add more devices</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={devices}
+          renderItem={renderDeviceItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.deviceListContainer}
+        />
+      )}
+    </ScreenWrapper>
+  );
+}
+
