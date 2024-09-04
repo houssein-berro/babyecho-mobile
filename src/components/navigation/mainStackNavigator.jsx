@@ -9,6 +9,8 @@ import CustomHeader from '../../components/customHeader/customHeader';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import TipsScreen from '../../screens/tips/tipsScreen';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import ConnectedDevicesScreen from '../../screens/devices/devicesScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -23,6 +25,13 @@ function HomeStack() {
           header: () => <CustomHeader title="Home" />,
         }}
       />
+      <Stack.Screen
+        name="Tips"
+        component={TipsScreen}
+        options={{
+          header: () => <CustomHeader title="Tips" />,
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -35,6 +44,20 @@ function RecordingStack() {
         component={RecordingScreen}
         options={{
           header: () => <CustomHeader title="Recording Room" />,
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function DeviceStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Devices"
+        component={ConnectedDevicesScreen}
+        options={{
+          header: () => <CustomHeader title="Connected Devices" />,
         }}
       />
     </Stack.Navigator>
@@ -68,15 +91,14 @@ function TabBarIcon({ name, color, size, focused }) {
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-      {name === 'lightbulb' ? (
-        <FontAwesome5 name={name} size={size} color={color} />
+      {name === 'devices' ? (
+        <MaterialIcons name={name} size={size} color={color} />
       ) : (
         <FontAwesome name={name} size={size} color={color} />
       )}
     </Animated.View>
   );
 }
-
 export default function MainTabNavigator() {
   return (
     <Tab.Navigator
@@ -91,8 +113,8 @@ export default function MainTabNavigator() {
             iconName = 'microphone';
           } else if (route.name === 'Babies') {
             iconName = 'plus';
-          } else if (route.name === 'Tips') {
-            iconName = 'lightbulb';
+          } else if (route.name === 'Devices') {
+            iconName = 'devices';
           }
 
           return (
@@ -103,31 +125,23 @@ export default function MainTabNavigator() {
               focused={focused}
             />
           );
-        },
-        tabBarLabel: ({ focused }) => (
-          focused ? (
-            <Text style={{ fontSize: 12, color: '#EF8D7F' }}>
-              {route.name}
-            </Text>
-          ) : null
-        ),
-      })}
+      //   },
+      //   tabBarLabel: ({ focused, color }) => (
+      //     <Text style={{ fontSize: 12, color: color }}>
+      //       {route.name}
+      //     </Text>
+      //   ),
+      //   tabBarStyle: {
+      //     height: 50,
+      //     paddingVertical: 7,
+      //     backgroundColor: '#f7f8fa',
+
+      //   },
+      // })}
       tabBarOptions={{
         activeTintColor: '#EF8D7F',
         inactiveTintColor: 'gray',
-        keyboardHidesTabBar: true,
-
-        style: {
-          backgroundColor: '#f7f8fa',
-          borderTopWidth: 0,
-          elevation: 5,
-        },
-        labelStyle: {
-          fontSize: 12,
-        },
-        tabStyle: {
-          paddingVertical: 3,
-        },
+        showLabel: true,
       }}
     >
       <Tab.Screen
@@ -140,11 +154,11 @@ export default function MainTabNavigator() {
         component={RecordingStack}
         options={{ headerShown: false }}
       />
-      <Tab.Screen
-        name="Tips"
-        component={TipsScreen}
+      {/* <Tab.Screen
+        name="Devices"
+        component={DeviceStack}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Tab.Screen
         name="Babies"
         component={BabyStack}
