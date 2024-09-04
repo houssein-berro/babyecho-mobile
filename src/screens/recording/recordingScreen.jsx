@@ -198,7 +198,7 @@ export default function RecordingScreen({navigation}) {
       console.log('Failed to cancel recording', error);
     }
   };
- 
+  
   useEffect(() => {
     let interval;
     if (isRecording) {
