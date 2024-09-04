@@ -15,12 +15,15 @@ export default function Onboarding2Screen({ navigation }) {
       <Button
         title="Login"
         onPress={() => navigation.replace('Login')}
+        style={styles.buttonContainer}
+
       />
       <Button
         title="Signup"
         onPress={() => navigation.replace('Signup')} 
         outlined={true}
         style={styles.signupButton}
+        
       />
     </OnboardingScreenWrapper>
   );
@@ -33,7 +36,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     width:'80%',
     color: '#424242',
-    marginBottom: 40,
+    marginBottom: 100,
   },
   image: {
     width: '100%',
@@ -48,6 +51,17 @@ const styles = StyleSheet.create({
   },
 
   signupButton: {
-    marginTop: 10,
+    position: 'absolute',
+    bottom: 95, 
+    left: 40,
+    right: 0,
+    paddingHorizontal: 20,
+  },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 30, 
+    left: 40,
+    right: 0,
+    paddingHorizontal: 20,
   },
 });
