@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -11,20 +11,22 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
-import { useDispatch, useSelector } from 'react-redux';
-import { uploadRecording } from '../../redux/recording/RecordingActions';
+import {useDispatch, useSelector} from 'react-redux';
+import {uploadRecording} from '../../redux/recording/RecordingActions';
 import Button from '../../components/button/button';
 import CustomModal from '../../components/customModal/customModal'; // Import the new component
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
-export default function RecordingScreen({ navigation }) {
+export default function RecordingScreen({navigation}) {
   const [isRecording, setIsRecording] = useState(false);
   const [dots, setDots] = useState('');
   const [recordSecs, setRecordSecs] = useState(0);
   const [formData, setFormData] = useState(null);
   const [recordingStopped, setRecordingStopped] = useState(false);
   const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
+  const [prediction, setPrediction] = useState(''); // State for storing the prediction
+
   const dispatch = useDispatch();
 
   // Access user data from Redux store
@@ -51,15 +53,24 @@ export default function RecordingScreen({ navigation }) {
     let readGranted = false;
     let recordGranted = false;
 
-    if (Platform.Version >= 33) { // Android 13+
+    if (Platform.Version >= 33) {
+      // Android 13+
       writeGranted = true; // WRITE_EXTERNAL_STORAGE not needed on Android 13+
-      readGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO);
+      readGranted = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
+      );
     } else {
-      writeGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-      readGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+      writeGranted = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      );
+      readGranted = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      );
     }
 
-    recordGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+    recordGranted = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+    );
 
     console.log('WRITE_EXTERNAL_STORAGE granted:', writeGranted);
     console.log('READ_EXTERNAL_STORAGE granted:', readGranted);
@@ -73,12 +84,13 @@ export default function RecordingScreen({ navigation }) {
   const requestPermissions = async () => {
     console.log('Requesting permissions...');
 
-    let permissionsToRequest = [
-      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-    ];
+    let permissionsToRequest = [PermissionsAndroid.PERMISSIONS.RECORD_AUDIO];
 
-    if (Platform.Version >= 33) { // Android 13+
-      permissionsToRequest.push(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO);
+    if (Platform.Version >= 33) {
+      // Android 13+
+      permissionsToRequest.push(
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
+      );
     } else {
       permissionsToRequest.push(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -87,18 +99,20 @@ export default function RecordingScreen({ navigation }) {
     }
 
     try {
-      const granted = await PermissionsAndroid.requestMultiple(permissionsToRequest);
+      const granted = await PermissionsAndroid.requestMultiple(
+        permissionsToRequest,
+      );
 
       console.log('Permissions requested:', granted);
 
       const writeGranted =
         granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] ===
-        PermissionsAndroid.RESULTS.GRANTED || Platform.Version >= 33;
+          PermissionsAndroid.RESULTS.GRANTED || Platform.Version >= 33;
       const readGranted =
         granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] ===
-        PermissionsAndroid.RESULTS.GRANTED ||
+          PermissionsAndroid.RESULTS.GRANTED ||
         granted[PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO] ===
-        PermissionsAndroid.RESULTS.GRANTED;
+          PermissionsAndroid.RESULTS.GRANTED;
       const recordGranted =
         granted[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] ===
         PermissionsAndroid.RESULTS.GRANTED;
@@ -112,44 +126,54 @@ export default function RecordingScreen({ navigation }) {
     }
   };
 
- const startRecording = async () => {
-  // Check if permissions are granted before starting the recording
-  const writeGranted =
-    Platform.Version >= 33 ||
-    (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE));
-  const readGranted =
-    Platform.Version >= 33 ||
-    (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE)) ||
-    (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO));
-  const recordGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+  const startRecording = async () => {
+    // Check if permissions are granted before starting the recording
+    const writeGranted =
+      Platform.Version >= 33 ||
+      (await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      ));
+    const readGranted =
+      Platform.Version >= 33 ||
+      (await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      )) ||
+      (await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
+      ));
+    const recordGranted = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+    );
 
-  if (!writeGranted || !readGranted || !recordGranted) {
-    console.log('Permissions are not granted, requesting permissions again...');
-    await requestPermissions();
-    return;
-  }
+    if (!writeGranted || !readGranted || !recordGranted) {
+      console.log(
+        'Permissions are not granted, requesting permissions again...',
+      );
+      await requestPermissions();
+      return;
+    }
 
-  // If permissions are granted, proceed with recording
-  try {
-    const result = await audioRecorderPlayer.startRecorder();
-    setIsRecording(true);
-    setDots('');
-    setRecordingStopped(false); // Reset the recording stopped state
-    audioRecorderPlayer.addRecordBackListener(e => {
-      setRecordSecs(e.currentPosition);
-      console.log('Recording back', e);
-    });
+    // If permissions are granted, proceed with recording
+    try {
+      const result = await audioRecorderPlayer.startRecorder();
+      setIsRecording(true);
+      setDots('');
+      setRecordingStopped(false); // Reset the recording stopped state
+      audioRecorderPlayer.addRecordBackListener(e => {
+        setRecordSecs(e.currentPosition);
+        console.log('Recording back', e);
+      });
 
-    // Stop recording after 7 seconds
-    setTimeout(async () => {
-      await stopRecording(); // Stop the recording after 7 seconds
-    }, 7000);
+      // Stop recording after 7 seconds
+      setTimeout(async () => {
+        await stopRecording(); // Stop the recording after 7 seconds
+      }, 7000);
 
-    console.log(result);
-  } catch (error) {
-    console.log('Failed to start recording', error);
-  }
-};
+      console.log(result);
+    } catch (error) {
+      console.log('Failed to start recording', error);
+    }
+  };
 
   const stopRecording = async () => {
     try {
@@ -204,10 +228,18 @@ export default function RecordingScreen({ navigation }) {
   useEffect(() => {
     if (formData) {
       console.log('Form Data Updated:', formData);
-      dispatch(uploadRecording(formData));
+      dispatch(uploadRecording(formData))
+      .then(response => {
+        console.log('====================================');
+        console.log('res',response);
+        console.log('====================================');
+        if (response) {
+          setPrediction(response);
+        }
+
+      });
     }
   }, [formData, dispatch]);
-
   return (
     <ScreenWrapper>
       <View style={styles.container}>
@@ -223,7 +255,10 @@ export default function RecordingScreen({ navigation }) {
                 isRecording ? stopRecording() : startRecording();
               }
             }}
-            style={[styles.outerCircle, isRecordingDisabled && styles.disabled]}>
+            style={[
+              styles.outerCircle,
+              isRecordingDisabled && styles.disabled,
+            ]}>
             <View style={styles.innerCircle}>
               {isRecording ? (
                 <Text style={styles.dots}>{dots}</Text>
@@ -253,6 +288,13 @@ export default function RecordingScreen({ navigation }) {
             />
           </View>
         )}
+         {/* Display the prediction if available */}
+         {/* {prediction && (
+          <View style={styles.predictionContainer}>
+            <Text style={styles.predictionTitle}>AI Prediction</Text>
+            <Text style={styles.predictionText}>{prediction}</Text>
+          </View>
+        )} */}
       </View>
       <CustomModal
         isVisible={modalVisible}
@@ -262,7 +304,6 @@ export default function RecordingScreen({ navigation }) {
     </ScreenWrapper>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -332,4 +373,22 @@ const styles = StyleSheet.create({
   disabled: {
     // backgroundColor: '#ccc',
   },
+  // predictionContainer: {
+  //   marginTop: 20,
+  //   padding: 20,
+  //   backgroundColor: '#f7f7f7',
+  //   borderRadius: 10,
+  //   width: '100%',
+  //   alignItems: 'center',
+  // },
+  // predictionTitle: {
+  //   fontSize: 20,
+  //   fontWeight: 'bold',
+  //   color: '#333',
+  //   marginBottom: 10,
+  // },
+  // predictionText: {
+  //   fontSize: 16,
+  //   color: '#666',
+  // },
 });
