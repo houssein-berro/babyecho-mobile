@@ -29,7 +29,7 @@ const CustomModal = ({ isVisible, onClose, onAddBaby }) => {
       </View>
     </Modal>
   );
-};
+}; 
 
 const styles = StyleSheet.create({
   modalContent: {
