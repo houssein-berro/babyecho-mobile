@@ -61,20 +61,20 @@ export default function BabyScreen({navigation}) {
     setShowAddBaby(false);
   };
 
-  // const handleBirthdateChange = text => {
-  //   const cleanedText = text.replace(/[^0-9]/g, '');
-  //   let formattedText = '';
+  const handleBirthdateChange = text => {
+    const cleanedText = text.replace(/[^0-9]/g, '');
+    let formattedText = '';
 
-  //   if (cleanedText.length <= 4) {
-  //     formattedText = cleanedText;
-  //   } else if (cleanedText.length <= 6) {
-  //     formattedText = `${cleanedText.slice(0, 4)}-${cleanedText.slice(4)}`;
-  //   } else if (cleanedText.length <= 8) {
-  //     formattedText = `${cleanedText.slice(0, 4)}-${cleanedText.slice(
-  //       4,
-  //       6,
-  //     )}-${cleanedText.slice(6)}`;
-  //   }
+    if (cleanedText.length <= 4) {
+      formattedText = cleanedText;
+    } else if (cleanedText.length <= 6) {
+      formattedText = `${cleanedText.slice(0, 4)}-${cleanedText.slice(4)}`;
+    } else if (cleanedText.length <= 8) {
+      formattedText = `${cleanedText.slice(0, 4)}-${cleanedText.slice(
+        4,
+        6,
+      )}-${cleanedText.slice(6)}`;
+    }
 
     setBirthdate(formattedText);
   };
