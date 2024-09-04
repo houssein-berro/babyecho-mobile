@@ -116,7 +116,7 @@ export default function BabyScreen({navigation}) {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
         <View style={styles.container}>
           <FlatList
-            data={user.babies}
+            data={user?.babies}
             renderItem={renderBabyItem}
             keyExtractor={(item, index) => index.toString()}
             ListEmptyComponent={
