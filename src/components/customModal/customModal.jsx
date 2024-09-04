@@ -31,7 +31,28 @@ const CustomModal = ({ isVisible, onClose, onAddBaby }) => {
   );
 };
 
-
+const styles = StyleSheet.create({
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#FF6B6B',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalCancelButton: {
+    marginTop: 10,
+  },
 });
 
 export default CustomModal;
