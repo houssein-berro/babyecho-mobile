@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: '#FFF5F7',
     borderRadius: 20,
-    width: '85%',
+    width: '85%', 
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
