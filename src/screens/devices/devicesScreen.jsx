@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
   },
   addButton: {
-    marginTop: 20,
+    marginTop: 20, 
     paddingVertical: 15,
     paddingHorizontal: 25,
     backgroundColor: '#EF8D7F',
