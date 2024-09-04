@@ -154,11 +154,11 @@ export default function MainTabNavigator() {
         component={RecordingStack}
         options={{ headerShown: false }}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Devices"
         component={DeviceStack}
         options={{ headerShown: false }}
-      /> */}
+      />
       <Tab.Screen
         name="Babies"
         component={BabyStack}
