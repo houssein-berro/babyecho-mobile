@@ -38,7 +38,7 @@ export default function SignupScreen({ navigation }) {
 
   useEffect(() => {
     if (user) {
-      navigation.replace('AddBaby'); // Navigate to AddBaby screen
+      navigation.replace('AddBaby');
     }
   }, [user, navigation]);
 
