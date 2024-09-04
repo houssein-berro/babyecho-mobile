@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   PermissionsAndroid,
   Platform,
   Linking,
@@ -14,6 +13,8 @@ import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadRecording } from '../../redux/recording/RecordingActions';
+import Button from '../../components/button/button';
+import CustomModal from '../../components/customModal/customModal'; // Import the new component
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
@@ -22,7 +23,8 @@ export default function RecordingScreen({ navigation }) {
   const [dots, setDots] = useState('');
   const [recordSecs, setRecordSecs] = useState(0);
   const [formData, setFormData] = useState(null);
-  const [recordingStopped, setRecordingStopped] = useState(false); // New state to track if recording has stopped
+  const [recordingStopped, setRecordingStopped] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
   const dispatch = useDispatch();
 
   // Access user data from Redux store
@@ -31,8 +33,10 @@ export default function RecordingScreen({ navigation }) {
   const [babyId, setBabyId] = useState();
 
   useEffect(() => {
-    setBabyId(user?.babies[0]._id);
+    setBabyId(user?.babies?.[0]?._id);
   }, [user]);
+
+  const isRecordingDisabled = !babyId;
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -99,66 +103,53 @@ export default function RecordingScreen({ navigation }) {
         granted[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] ===
         PermissionsAndroid.RESULTS.GRANTED;
 
-      if (!writeGranted || !readGranted || !recordGranted) {
-        Alert.alert(
-          'Permissions Required',
-          'Please enable all permissions in settings to use this feature.',
-          [
-            {
-              text: 'Open Settings',
-              onPress: openSettings,
-            },
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-          ]
-        );
-      }
-    } catch (err) {
-      console.warn(err);
-      Alert.alert('Error', 'An error occurred while requesting permissions.');
-    }
+    //   if (!writeGranted || !readGranted || !recordGranted) {
+    //     setModalVisible(true); // Show modal if permissions aren't granted
+    //   }
+    // } catch (err) {
+    //   console.warn(err);
+    //   setModalVisible(true); // Show modal on error
+    // }
   };
 
-  const openSettings = () => {
-    Linking.openSettings().catch(() => {
-      Alert.alert('Error', 'Unable to open settings');
+ const startRecording = async () => {
+  // Check if permissions are granted before starting the recording
+  const writeGranted =
+    Platform.Version >= 33 ||
+    (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE));
+  const readGranted =
+    Platform.Version >= 33 ||
+    (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE)) ||
+    (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO));
+  const recordGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+
+  if (!writeGranted || !readGranted || !recordGranted) {
+    console.log('Permissions are not granted, requesting permissions again...');
+    await requestPermissions();
+    return;
+  }
+
+  // If permissions are granted, proceed with recording
+  try {
+    const result = await audioRecorderPlayer.startRecorder();
+    setIsRecording(true);
+    setDots('');
+    setRecordingStopped(false); // Reset the recording stopped state
+    audioRecorderPlayer.addRecordBackListener(e => {
+      setRecordSecs(e.currentPosition);
+      console.log('Recording back', e);
     });
-  };
 
-  const startRecording = async () => {
-    // Check if permissions are granted before starting the recording
-    const writeGranted =
-      Platform.Version >= 33 ||
-      (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE));
-    const readGranted =
-      Platform.Version >= 33 ||
-      (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE)) ||
-      (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO));
-    const recordGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+    // // Stop recording after 7 seconds
+    // setTimeout(async () => {
+    //   await stopRecording(); // Stop the recording after 7 seconds
+    // }, 7000);
 
-    if (!writeGranted || !readGranted || !recordGranted) {
-      console.log('Permissions are not granted, requesting permissions again...');
-      await requestPermissions();
-      return;
-    }
-
-    // If permissions are granted, proceed with recording
-    try {
-      const result = await audioRecorderPlayer.startRecorder();
-      setIsRecording(true);
-      setDots('');
-      setRecordingStopped(false); // Reset the recording stopped state
-      audioRecorderPlayer.addRecordBackListener(e => {
-        setRecordSecs(e.currentPosition);
-        console.log('Recording back', e);
-      });
-      console.log(result);
-    } catch (error) {
-      console.log('Failed to start recording', error);
-    }
-  };
+    console.log(result);
+  } catch (error) {
+    console.log('Failed to start recording', error);
+  }
+};
 
   const stopRecording = async () => {
     try {
@@ -225,8 +216,14 @@ export default function RecordingScreen({ navigation }) {
         </Text>
         <View style={styles.microphoneContainer}>
           <TouchableOpacity
-            onPress={isRecording ? stopRecording : startRecording}
-            style={styles.outerCircle}>
+            // onPress={() => {
+            //   if (isRecordingDisabled) {
+            //     setModalVisible(true);
+            //   } else {
+            //     isRecording ? stopRecording() : startRecording();
+            //   }
+            // }}
+            style={[styles.outerCircle, isRecordingDisabled && styles.disabled]}>
             <View style={styles.innerCircle}>
               {isRecording ? (
                 <Text style={styles.dots}>{dots}</Text>
@@ -236,32 +233,36 @@ export default function RecordingScreen({ navigation }) {
             </View>
           </TouchableOpacity>
         </View>
-        {recordingStopped && (
-          <Text style={styles.description}>
-            Your baby’s sounds are being analyzed. Stay close and receive
-            real-time feedback.
-          </Text>
-        )}
-        <View style={styles.buttonGroup}>
-          {isRecording && (
-            <TouchableOpacity
+        <Text style={styles.description}>
+          {isRecording
+            ? 'Tap the microphone to stop recording.'
+            : 'Tap the microphone to start recording.'}
+        </Text>
+        {isRecording && (
+          <View style={styles.buttonGroup}>
+            <Button
+              title="Cancel"
               onPress={cancelRecording}
-              style={[styles.button, styles.cancelButton]}>
-              <Text style={styles.buttonText}>Cancel</Text>
-            </TouchableOpacity>
-          )}
-          {isRecording && (
-            <TouchableOpacity
+              style={styles.cancelButton}
+              outlined={true}
+            />
+            <Button
+              title="Stop"
               onPress={stopRecording}
-              style={[styles.button, styles.stopButton]}>
-              <Text style={styles.buttonText}>Stop</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+              style={styles.stopButton}
+            />
+          </View>
+        )}
       </View>
+      <CustomModal
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onAddBaby={() => navigation.navigate('AddBaby')}
+      />
     </ScreenWrapper>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 23,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 40,
@@ -289,7 +290,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
+    shadowOffset: {width: 0, height: 5},
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 5,
@@ -317,28 +318,18 @@ const styles = StyleSheet.create({
   buttonGroup: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '80%',
-  },
-  button: {
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 30,
-    marginHorizontal: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  cancelButton: {
-    backgroundColor: '#FFB3B3',
-  },
-  stopButton: {
-    backgroundColor: '#FF6B6B',
-  },
-  buttonText: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: '600',
-  },
+  //   alignItems: 'center',
+  //   width: '90%',
+  // },
+  // cancelButton: {
+  //   flex: 1,
+  //   marginRight: 5,
+  // },
+  // stopButton: {
+  //   flex: 1,
+  //   marginLeft: 5,
+  // },
+  // disabled: {
+  //   // backgroundColor: '#ccc',
+  // },
 });
