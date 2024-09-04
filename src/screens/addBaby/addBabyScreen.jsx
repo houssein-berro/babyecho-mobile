@@ -50,10 +50,10 @@ export default function BabyScreen({navigation}) {
     }
 
     if (!isValidDate(birthdate)) {
-      // Alert.alert(
-      //   'Error',
-      //   'Please enter a valid birthdate in the format YYYY-MM-DD.',
-      // );
+      Alert.alert(
+        'Error',
+        'Please enter a valid birthdate in the format YYYY-MM-DD.',
+      );
       return;
     }
 
