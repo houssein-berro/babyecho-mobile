@@ -23,4 +23,8 @@ export default function ConnectedDevicesScreen({navigation}) {
     setDevices(fetchedDevices);
   }, [user]);
 
- 
+  const renderDeviceItem = ({item}) => (
+    <View style={styles.deviceCard}>
+      <Text style={styles.deviceText}>{item.name}</Text>
+    </View>
+  );
