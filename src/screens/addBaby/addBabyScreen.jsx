@@ -190,7 +190,7 @@ export default function BabyScreen({navigation}) {
               <Text style={styles.label}>Gender</Text>
               <View style={styles.switchContainer}>
                 <View style={styles.switchLabelContainer}>
-                  {/* <FontAwesome
+                  <FontAwesome
                     name="male"
                     size={24}
                     color={isMale ? '#61dbfb' : '#ccc'}
@@ -202,7 +202,7 @@ export default function BabyScreen({navigation}) {
                     ]}>
                     Boy
                   </Text>
-                </View> */}
+                </View>
                 <Switch
                   value={isMale}
                   onValueChange={setIsMale}
@@ -211,7 +211,7 @@ export default function BabyScreen({navigation}) {
                   style={styles.switch}
                 />
                 <View style={styles.switchLabelContainer}>
-                  {/* <FontAwesome
+                  <FontAwesome
                     name="female"
                     size={24}
                     color={!isMale ? '#f7b7d2' : '#ccc'}
@@ -222,7 +222,7 @@ export default function BabyScreen({navigation}) {
                       {color: !isMale ? '#f7b7d2' : '#ccc'},
                     ]}>
                     Girl
-                  </Text> */}
+                  </Text>
                 </View>
               </View>
 
