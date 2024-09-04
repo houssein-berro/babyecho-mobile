@@ -9,6 +9,7 @@ import OnboardingNavigator from './components/navigation/onboardingNavigator';
 import MainStackNavigator from './components/navigation/mainStackNavigator';
 import LoginScreen from './screens/auth/loginScreen';
 import SignupScreen from './screens/auth/signupScreen';
+import MoonAndStarsSpinner from './components/spinner/spinner';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,7 +33,7 @@ export default function AppContent() {
   }, [dispatch]);
 
   if (isLoading) {
-    return null; // Or a loading spinner
+    return <MoonAndStarsSpinner/>;
   }
 
   return (
