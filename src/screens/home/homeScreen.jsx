@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,14 +14,21 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function HomeScreen({navigation}) {
-  const user = useSelector(state => state.user.user);
+  const auth = useSelector(state => state.user.user);
+  console.log(user);
+  const [user,setUser] = useState([]);
 
+  useEffect(()=>{
+    setUser(auth)
+    console.log('us',user);
+    
+  },[auth])
   return (
     <ScreenWrapper>
       {/* Welcome Message */}
       <View style={styles.header}>
         <Text style={styles.welcomeText}>
-          Hi, {user ? user.username : 'there'}!
+          Hi, {user ? user.username : 'User'}!
         </Text>
         <Text style={styles.subtitle}>What would you like to do today?</Text>
       </View>
@@ -105,7 +112,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   welcomeText: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#333',
   },
