@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   recordings: [],
-  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  mlResponse:"",
+  status: 'idle',
   error: null
 };
 
@@ -21,6 +22,7 @@ const recordingSlice = createSlice({
       state.status = 'failed';
       state.error = action.payload;
     },
+
   },
 });
 
