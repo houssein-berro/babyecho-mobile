@@ -54,3 +54,42 @@ export default function ConnectedDevicesScreen({navigation}) {
   );
 }
 
+const styles = StyleSheet.create({
+  emptyStateContainer: {
+    paddingTop:40
+  },
+  deviceCard: {
+    width: '100%',
+    padding: 20,
+    borderColor: '#E5E5E5',
+    borderWidth: 2,
+    borderRadius: 10,
+    marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'left',
+    alignSelf: 'center',
+  },
+  deviceText: {
+    fontSize: 18,
+    color: '#959595',
+    fontFamily: 'Inter-Medium',
+  },
+  addButton: {
+    marginTop: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    backgroundColor: '#EF8D7F',
+    borderRadius: 10,
+  },
+  addButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+    fontFamily: 'Inter-Medium',
+    
+  },
+  deviceListContainer: {
+    paddingBottom: 20,
+  },
+});
