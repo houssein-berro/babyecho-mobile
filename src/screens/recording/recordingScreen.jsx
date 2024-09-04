@@ -289,12 +289,12 @@ export default function RecordingScreen({navigation}) {
           </View>
         )}
          {/* Display the prediction if available */}
-         {/* {prediction && (
+         {prediction && (
           <View style={styles.predictionContainer}>
             <Text style={styles.predictionTitle}>AI Prediction</Text>
             <Text style={styles.predictionText}>{prediction}</Text>
           </View>
-        )} */}
+        )}
       </View>
       <CustomModal
         isVisible={modalVisible}

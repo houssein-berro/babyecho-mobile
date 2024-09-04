@@ -40,9 +40,11 @@ export const uploadRecording = (formData) => async (dispatch) => {
       resultDetails: MLresponse.data.prediction,
     });
     // Dispatch success action with the recording data and prediction from ML server
-    dispatch(uploadSuccess({ mlPrediction: MLresponse.data.prediction }));
+
+    dispatch(uploadSuccess({ mlPrediction: MLresponse?.data?.prediction }));
+    return MLresponse.data.prediction;  
   } catch (error) {
-    console.error('Error uploading recording:', error);
+    // console.error('Error uploading recording:', error);
     dispatch(uploadFailure(error.message));
   }
 };
