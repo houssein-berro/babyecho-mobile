@@ -216,13 +216,13 @@ export default function RecordingScreen({ navigation }) {
         </Text>
         <View style={styles.microphoneContainer}>
           <TouchableOpacity
-            // onPress={() => {
-            //   if (isRecordingDisabled) {
-            //     setModalVisible(true);
-            //   } else {
-            //     isRecording ? stopRecording() : startRecording();
-            //   }
-            // }}
+            onPress={() => {
+              if (isRecordingDisabled) {
+                setModalVisible(true);
+              } else {
+                isRecording ? stopRecording() : startRecording();
+              }
+            }}
             style={[styles.outerCircle, isRecordingDisabled && styles.disabled]}>
             <View style={styles.innerCircle}>
               {isRecording ? (
