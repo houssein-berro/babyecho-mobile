@@ -318,18 +318,18 @@ const styles = StyleSheet.create({
   buttonGroup: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-  //   alignItems: 'center',
-  //   width: '90%',
-  // },
-  // cancelButton: {
-  //   flex: 1,
-  //   marginRight: 5,
-  // },
-  // stopButton: {
-  //   flex: 1,
-  //   marginLeft: 5,
-  // },
-  // disabled: {
-  //   // backgroundColor: '#ccc',
-  // },
+    alignItems: 'center',
+    width: '90%',
+  },
+  cancelButton: {
+    flex: 1,
+    marginRight: 5,
+  },
+  stopButton: {
+    flex: 1,
+    marginLeft: 5,
+  },
+  disabled: {
+    // backgroundColor: '#ccc',
+  },
 });
