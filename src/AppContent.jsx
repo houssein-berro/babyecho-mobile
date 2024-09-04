@@ -18,7 +18,7 @@ export default function AppContent() {
   const dispatch = useDispatch();
   const [initialRoute, setInitialRoute] = useState('Onboarding');
 
-  useEffect(() => {
+  useEffect(() => { 
     const checkToken = async () => {
       const isValid = await dispatch(validateToken());
       if (isValid) {
