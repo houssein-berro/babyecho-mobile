@@ -160,12 +160,12 @@ export default function BabyScreen({navigation}) {
                   onChangeText={setName}
                   placeholderTextColor="#9E9E9E"
                 />
-                {/* <FontAwesome
+                <FontAwesome
                   name="user"
                   size={20}
                   color="#9E9E9E"
                   style={styles.icon}
-                /> */}
+                />
               </View>
 
               <Text style={styles.label}>Birthdate</Text>
@@ -179,12 +179,12 @@ export default function BabyScreen({navigation}) {
                   keyboardType="numeric"
                   placeholderTextColor="#9E9E9E"
                 />
-                {/* <FontAwesome
+                <FontAwesome
                   name="calendar"
                   size={20}
                   color="#9E9E9E"
                   style={styles.icon}
-                /> */}
+                />
               </View>
 
               <Text style={styles.label}>Gender</Text>
