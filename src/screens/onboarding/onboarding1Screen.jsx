@@ -15,6 +15,7 @@ export default function Onboarding1Screen({ navigation }) {
       <Button
         title="Continue"
         onPress={() => navigation.navigate('Onboarding2')}
+        style={styles.buttonContainer}
       />
     </OnboardingScreenWrapper>
   );
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     width:'80%',
     color: '#424242',
-    marginBottom: 40,
+    marginBottom: 100,
   },
   image: {
     width: '100%',
@@ -39,5 +40,12 @@ const styles = StyleSheet.create({
     color: '#666666',
     textAlign: 'center',
     marginBottom: 60,
+  },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 30, 
+    left: 40,
+    right: 0,
+    paddingHorizontal: 20,
   },
 });
