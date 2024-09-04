@@ -120,18 +120,18 @@ export default function BabyScreen({navigation}) {
             renderItem={renderBabyItem}
             keyExtractor={(item, index) => index.toString()}
             ListEmptyComponent={
-              // <Text style={styles.noBabiesText}>No babies added yet.</Text>
+              <Text style={styles.noBabiesText}>No babies added yet.</Text>
             }
             contentContainerStyle={styles.babiesListContainer}
           />
-{/* 
+
           <TouchableOpacity
             onPress={() => setShowAddBaby(!showAddBaby)}
             style={styles.fixedButton}>
             <Text style={styles.fixedButtonText}>
               {showAddBaby ? 'Cancel' : 'Add New Baby'}
             </Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
 
           {showAddBaby && (
             <Animated.View
