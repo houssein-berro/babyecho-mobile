@@ -36,9 +36,9 @@ export const uploadRecording = (formData) => async (dispatch) => {
         'Content-Type': 'multipart/form-data',
       },
     });
-    await axios.put(`${BACKEND_URL}/api/recordings/${recordingId}/analysis`, {
-      resultDetails: MLresponse.data.prediction,
-    });
+    // await axios.put(`${BACKEND_URL}/api/recordings/${recordingId}/analysis`, {
+    //   resultDetails: MLresponse.data.prediction,
+    // });
     // Dispatch success action with the recording data and prediction from ML server
     dispatch(uploadSuccess({ mlPrediction: MLresponse.data.prediction }));
   } catch (error) {
