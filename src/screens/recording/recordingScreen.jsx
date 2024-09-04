@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   PermissionsAndroid,
   Platform,
-  Modal,  // Import Modal for popup
+  Modal,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
@@ -14,7 +14,7 @@ import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import {useDispatch, useSelector} from 'react-redux';
 import {uploadRecording} from '../../redux/recording/RecordingActions';
 import Button from '../../components/button/button';
-import CustomModal from '../../components/customModal/customModal'; // Import the custom modal
+import CustomModal from '../../components/customModal/customModal'; // Import the new component
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
@@ -24,10 +24,10 @@ export default function RecordingScreen({navigation}) {
   const [recordSecs, setRecordSecs] = useState(0);
   const [formData, setFormData] = useState(null);
   const [recordingStopped, setRecordingStopped] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
-  const [predictionPopupVisible, setPredictionPopupVisible] = useState(false); // Popup visibility state
-  const [prediction, setPrediction] = useState(''); // State for storing the prediction
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [predictionPopupVisible, setPredictionPopupVisible] = useState(false);
+  const [prediction, setPrediction] = useState('');
+  const [timer, setTimer] = useState(7); // Timer for 7 seconds
   const dispatch = useDispatch();
 
   // Access user data from Redux store
@@ -48,14 +48,12 @@ export default function RecordingScreen({navigation}) {
   }, []);
 
   const checkAndRequestPermissions = async () => {
-    console.log('Checking permissions...');
-
     let writeGranted = false;
     let readGranted = false;
     let recordGranted = false;
 
     if (Platform.Version >= 33) {
-      writeGranted = true; // WRITE_EXTERNAL_STORAGE not needed on Android 13+
+      writeGranted = true;
       readGranted = await PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
       );
@@ -72,18 +70,12 @@ export default function RecordingScreen({navigation}) {
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
     );
 
-    console.log('WRITE_EXTERNAL_STORAGE granted:', writeGranted);
-    console.log('READ_EXTERNAL_STORAGE granted:', readGranted);
-    console.log('RECORD_AUDIO granted:', recordGranted);
-
     if (!writeGranted || !readGranted || !recordGranted) {
       await requestPermissions();
     }
   };
 
   const requestPermissions = async () => {
-    console.log('Requesting permissions...');
-
     let permissionsToRequest = [PermissionsAndroid.PERMISSIONS.RECORD_AUDIO];
 
     if (Platform.Version >= 33) {
@@ -101,8 +93,6 @@ export default function RecordingScreen({navigation}) {
       const granted = await PermissionsAndroid.requestMultiple(
         permissionsToRequest,
       );
-
-      console.log('Permissions requested:', granted);
 
       const writeGranted =
         granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] ===
@@ -144,9 +134,6 @@ export default function RecordingScreen({navigation}) {
     );
 
     if (!writeGranted || !readGranted || !recordGranted) {
-      console.log(
-        'Permissions are not granted, requesting permissions again...',
-      );
       await requestPermissions();
       return;
     }
@@ -155,17 +142,21 @@ export default function RecordingScreen({navigation}) {
       const result = await audioRecorderPlayer.startRecorder();
       setIsRecording(true);
       setDots('');
-      setRecordingStopped(false); 
+      setRecordingStopped(false);
+      setTimer(7); // Reset the timer to 7 seconds
       audioRecorderPlayer.addRecordBackListener(e => {
         setRecordSecs(e.currentPosition);
-        console.log('Recording back', e);
       });
+
+      const countdown = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
 
       setTimeout(async () => {
         await stopRecording();
+        clearInterval(countdown); // Stop the countdown timer when recording stops
       }, 7000);
 
-      console.log(result);
     } catch (error) {
       console.log('Failed to start recording', error);
     }
@@ -178,7 +169,6 @@ export default function RecordingScreen({navigation}) {
       setDots('');
       setRecordingStopped(true);
       audioRecorderPlayer.removeRecordBackListener();
-      console.log('Recording file saved at:', result);
 
       const newFormData = new FormData();
       newFormData.append('audioFile', {
@@ -203,6 +193,7 @@ export default function RecordingScreen({navigation}) {
       setDots('');
       setRecordSecs(0);
       setRecordingStopped(false);
+      setTimer(7); // Reset the timer
     } catch (error) {
       console.log('Failed to cancel recording', error);
     }
@@ -222,15 +213,10 @@ export default function RecordingScreen({navigation}) {
 
   useEffect(() => {
     if (formData) {
-      console.log('Form Data Updated:', formData);
-      dispatch(uploadRecording(formData))
-      .then(response => {
-        console.log('====================================');
-        console.log('res',response);
-        console.log('====================================');
+      dispatch(uploadRecording(formData)).then(response => {
         if (response) {
           setPrediction(response);
-          setPredictionPopupVisible(true); // Show popup when prediction is available
+          setPredictionPopupVisible(true);
         }
       });
     }
@@ -242,6 +228,11 @@ export default function RecordingScreen({navigation}) {
         <Text style={styles.title}>
           {isRecording ? 'Recording...' : 'Ready to Record'}
         </Text>
+
+        {isRecording && (
+          <Text style={styles.timerText}>Time left: {timer} seconds</Text>
+        )}
+
         <View style={styles.microphoneContainer}>
           <TouchableOpacity
             onPress={() => {
@@ -264,11 +255,19 @@ export default function RecordingScreen({navigation}) {
             </View>
           </TouchableOpacity>
         </View>
+
+        {isRecording && (
+          <Text style={styles.warningText}>
+            * For best results, make sure the audio is exactly 7 seconds long.
+          </Text>
+        )}
+
         <Text style={styles.description}>
           {isRecording
             ? 'Tap the microphone to stop recording.'
             : 'Tap the microphone to start recording.'}
         </Text>
+
         {isRecording && (
           <View style={styles.buttonGroup}>
             <Button
@@ -290,14 +289,14 @@ export default function RecordingScreen({navigation}) {
           transparent={true}
           visible={predictionPopupVisible}
           animationType="slide"
-          onRequestClose={() => setPredictionPopupVisible(false)} // Close the popup
+          onRequestClose={() => setPredictionPopupVisible(false)}
         >
           <View style={styles.modalBackground}>
             <View style={styles.predictionContainer}>
               <Text style={styles.predictionTitle}>AI Prediction</Text>
               <Text style={styles.predictionText}>{prediction}</Text>
               <TouchableOpacity
-                onPress={() => setPredictionPopupVisible(false)} // Close button for the popup
+                onPress={() => setPredictionPopupVisible(false)}
                 style={styles.closeButton}
               >
                 <Text style={styles.closeButtonText}>Close</Text>
@@ -329,10 +328,22 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 40,
   },
+  timerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FF6B6B',
+    marginBottom: 20,
+  },
   microphoneContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 40,
+  },
+  warningText: {
+    color: '#FF6B6B',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 10,
   },
   outerCircle: {
     width: 200,
@@ -388,14 +399,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   predictionContainer: {
     paddingVertical: 25,
     paddingHorizontal: 20,
     backgroundColor: '#FFF5F7',
     borderRadius: 20,
-    width: '85%', 
+    width: '85%',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
