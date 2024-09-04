@@ -103,13 +103,13 @@ export default function RecordingScreen({ navigation }) {
         granted[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] ===
         PermissionsAndroid.RESULTS.GRANTED;
 
-    //   if (!writeGranted || !readGranted || !recordGranted) {
-    //     setModalVisible(true); // Show modal if permissions aren't granted
-    //   }
-    // } catch (err) {
-    //   console.warn(err);
-    //   setModalVisible(true); // Show modal on error
-    // }
+      if (!writeGranted || !readGranted || !recordGranted) {
+        setModalVisible(true); // Show modal if permissions aren't granted
+      }
+    } catch (err) {
+      console.warn(err);
+      setModalVisible(true); // Show modal on error
+    }
   };
 
  const startRecording = async () => {
