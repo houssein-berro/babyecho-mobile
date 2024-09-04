@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   PermissionsAndroid,
   Platform,
-  Linking,
+  Modal,  // Import Modal for popup
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
@@ -14,7 +14,7 @@ import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import {useDispatch, useSelector} from 'react-redux';
 import {uploadRecording} from '../../redux/recording/RecordingActions';
 import Button from '../../components/button/button';
-import CustomModal from '../../components/customModal/customModal'; // Import the new component
+import CustomModal from '../../components/customModal/customModal'; // Import the custom modal
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
@@ -25,6 +25,7 @@ export default function RecordingScreen({navigation}) {
   const [formData, setFormData] = useState(null);
   const [recordingStopped, setRecordingStopped] = useState(false);
   const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
+  const [predictionPopupVisible, setPredictionPopupVisible] = useState(false); // Popup visibility state
   const [prediction, setPrediction] = useState(''); // State for storing the prediction
 
   const dispatch = useDispatch();
@@ -54,7 +55,6 @@ export default function RecordingScreen({navigation}) {
     let recordGranted = false;
 
     if (Platform.Version >= 33) {
-      // Android 13+
       writeGranted = true; // WRITE_EXTERNAL_STORAGE not needed on Android 13+
       readGranted = await PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
@@ -87,7 +87,6 @@ export default function RecordingScreen({navigation}) {
     let permissionsToRequest = [PermissionsAndroid.PERMISSIONS.RECORD_AUDIO];
 
     if (Platform.Version >= 33) {
-      // Android 13+
       permissionsToRequest.push(
         PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
       );
@@ -127,7 +126,6 @@ export default function RecordingScreen({navigation}) {
   };
 
   const startRecording = async () => {
-    // Check if permissions are granted before starting the recording
     const writeGranted =
       Platform.Version >= 33 ||
       (await PermissionsAndroid.check(
@@ -153,20 +151,18 @@ export default function RecordingScreen({navigation}) {
       return;
     }
 
-    // If permissions are granted, proceed with recording
     try {
       const result = await audioRecorderPlayer.startRecorder();
       setIsRecording(true);
       setDots('');
-      setRecordingStopped(false); // Reset the recording stopped state
+      setRecordingStopped(false); 
       audioRecorderPlayer.addRecordBackListener(e => {
         setRecordSecs(e.currentPosition);
         console.log('Recording back', e);
       });
 
-      // Stop recording after 7 seconds
       setTimeout(async () => {
-        await stopRecording(); // Stop the recording after 7 seconds
+        await stopRecording();
       }, 7000);
 
       console.log(result);
@@ -180,11 +176,10 @@ export default function RecordingScreen({navigation}) {
       const result = await audioRecorderPlayer.stopRecorder();
       setIsRecording(false);
       setDots('');
-      setRecordingStopped(true); // Set recording stopped state to true
+      setRecordingStopped(true);
       audioRecorderPlayer.removeRecordBackListener();
       console.log('Recording file saved at:', result);
 
-      // Prepare the form data and update the state
       const newFormData = new FormData();
       newFormData.append('audioFile', {
         uri: result,
@@ -206,8 +201,8 @@ export default function RecordingScreen({navigation}) {
       await audioRecorderPlayer.stopRecorder();
       setIsRecording(false);
       setDots('');
-      setRecordSecs(0); // Reset the recording duration
-      setRecordingStopped(false); // Reset the recording stopped state
+      setRecordSecs(0);
+      setRecordingStopped(false);
     } catch (error) {
       console.log('Failed to cancel recording', error);
     }
@@ -235,11 +230,12 @@ export default function RecordingScreen({navigation}) {
         console.log('====================================');
         if (response) {
           setPrediction(response);
+          setPredictionPopupVisible(true); // Show popup when prediction is available
         }
-
       });
     }
   }, [formData, dispatch]);
+
   return (
     <ScreenWrapper>
       <View style={styles.container}>
@@ -288,14 +284,29 @@ export default function RecordingScreen({navigation}) {
             />
           </View>
         )}
-         {/* Display the prediction if available */}
-         {prediction && (
-          <View style={styles.predictionContainer}>
-            <Text style={styles.predictionTitle}>AI Prediction</Text>
-            <Text style={styles.predictionText}>{prediction}</Text>
+
+        {/* Modal for displaying AI prediction */}
+        <Modal
+          transparent={true}
+          visible={predictionPopupVisible}
+          animationType="slide"
+          onRequestClose={() => setPredictionPopupVisible(false)} // Close the popup
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.predictionContainer}>
+              <Text style={styles.predictionTitle}>AI Prediction</Text>
+              <Text style={styles.predictionText}>{prediction}</Text>
+              <TouchableOpacity
+                onPress={() => setPredictionPopupVisible(false)} // Close button for the popup
+                style={styles.closeButton}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        )}
+        </Modal>
       </View>
+
       <CustomModal
         isVisible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -373,22 +384,53 @@ const styles = StyleSheet.create({
   disabled: {
     // backgroundColor: '#ccc',
   },
-  predictionContainer: {
-    marginTop: 20,
-    padding: 20,
-    backgroundColor: '#f7f7f7',
-    borderRadius: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  predictionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  predictionText: {
-    fontSize: 16,
-    color: '#666',
-  },
+  // modalBackground: {
+  //   flex: 1,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  // },
+  // predictionContainer: {
+  //   paddingVertical: 25,
+  //   paddingHorizontal: 20,
+  //   backgroundColor: '#FFF5F7',
+  //   borderRadius: 20,
+  //   width: '85%',
+  //   alignItems: 'center',
+  //   shadowColor: '#000',
+  //   shadowOffset: { width: 0, height: 6 },
+  //   shadowOpacity: 0.1,
+  //   shadowRadius: 8,
+  //   elevation: 6,
+  //   borderWidth: 1,
+  //   borderColor: '#FF6B6B',
+  // },
+  // predictionTitle: {
+  //   fontSize: 24,
+  //   fontWeight: 'bold',
+  //   color: '#FF6B6B',
+  //   marginBottom: 15,
+  //   textTransform: 'uppercase',
+  //   letterSpacing: 1.2,
+  // },
+  // predictionText: {
+  //   fontSize: 18,
+  //   color: '#333',
+  //   textAlign: 'center',
+  //   lineHeight: 26,
+  //   fontStyle: 'italic',
+  //   letterSpacing: 0.8,
+  // },
+  // closeButton: {
+  //   marginTop: 20,
+  //   backgroundColor: '#FF6B6B',
+  //   paddingVertical: 10,
+  //   paddingHorizontal: 20,
+  //   borderRadius: 10,
+  // },
+  // closeButtonText: {
+  //   color: '#fff',
+  //   fontSize: 16,
+  //   fontWeight: 'bold',
+  // },
 });
