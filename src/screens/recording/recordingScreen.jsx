@@ -140,10 +140,10 @@ export default function RecordingScreen({ navigation }) {
       console.log('Recording back', e);
     });
 
-    // // Stop recording after 7 seconds
-    // setTimeout(async () => {
-    //   await stopRecording(); // Stop the recording after 7 seconds
-    // }, 7000);
+    // Stop recording after 7 seconds
+    setTimeout(async () => {
+      await stopRecording(); // Stop the recording after 7 seconds
+    }, 7000);
 
     console.log(result);
   } catch (error) {
