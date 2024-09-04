@@ -125,19 +125,19 @@ export default function MainTabNavigator() {
               focused={focused}
             />
           );
-      //   },
-      //   tabBarLabel: ({ focused, color }) => (
-      //     <Text style={{ fontSize: 12, color: color }}>
-      //       {route.name}
-      //     </Text>
-      //   ),
-      //   tabBarStyle: {
-      //     height: 50,
-      //     paddingVertical: 7,
-      //     backgroundColor: '#f7f8fa',
+        },
+        tabBarLabel: ({ focused, color }) => (
+          <Text style={{ fontSize: 12, color: color }}>
+            {route.name}
+          </Text>
+        ),
+        tabBarStyle: {
+          height: 50,
+          paddingVertical: 7,
+          backgroundColor: '#f7f8fa',
 
-      //   },
-      // })}
+        },
+      })}
       tabBarOptions={{
         activeTintColor: '#EF8D7F',
         inactiveTintColor: 'gray',
