@@ -54,7 +54,7 @@ function DeviceStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Devices"
+        name="DevicesMain"
         component={ConnectedDevicesScreen}
         options={{
           header: () => <CustomHeader title="Connected Devices" />,
@@ -104,6 +104,8 @@ export default function MainTabNavigator() {
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={({ route }) => ({
+        tabBarHideOnKeyboard: true,
+
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
 
@@ -137,6 +139,7 @@ export default function MainTabNavigator() {
           backgroundColor: '#f7f8fa',
 
         },
+       
       })}
       tabBarOptions={{
         activeTintColor: '#EF8D7F',
