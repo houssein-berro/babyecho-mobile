@@ -74,13 +74,13 @@ const styles = StyleSheet.create({
     color: '#959595',
     fontFamily: 'Inter-Medium',
   },
-  // addButton: {
-  //   position: 'absolute',
-  //   bottom: 20, 
-  //   left: 40,
-  //   right: 40,
-  //   paddingHorizontal: 20,
-  // },
+  addButton: {
+    position: 'absolute',
+    bottom: 20, 
+    left: 40,
+    right: 40,
+    paddingHorizontal: 20,
+  },
   deviceListContainer: {
     paddingBottom: 20,
   },
