@@ -7,6 +7,7 @@ import {
   PermissionsAndroid,
   Platform,
   Modal,
+  ActivityIndicator,  // Import activity indicator for loading
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
@@ -14,7 +15,7 @@ import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import {useDispatch, useSelector} from 'react-redux';
 import {uploadRecording} from '../../redux/recording/RecordingActions';
 import Button from '../../components/button/button';
-import CustomModal from '../../components/customModal/customModal'; // Import the new component
+import CustomModal from '../../components/customModal/customModal';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
@@ -26,11 +27,11 @@ export default function RecordingScreen({navigation}) {
   const [recordingStopped, setRecordingStopped] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [predictionPopupVisible, setPredictionPopupVisible] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state for prediction processing
   const [prediction, setPrediction] = useState('');
-  const [timer, setTimer] = useState(7); // Timer for 7 seconds
+  const [timer, setTimer] = useState(7);
   const dispatch = useDispatch();
 
-  // Access user data from Redux store
   const user = useSelector(state => state.user.user);
   const userId = user ? user._id : null;
   const [babyId, setBabyId] = useState();
@@ -198,7 +199,7 @@ export default function RecordingScreen({navigation}) {
       console.log('Failed to cancel recording', error);
     }
   };
-  
+
   useEffect(() => {
     let interval;
     if (isRecording) {
@@ -213,11 +214,13 @@ export default function RecordingScreen({navigation}) {
 
   useEffect(() => {
     if (formData) {
+      setLoading(true); // Start loading indicator
       dispatch(uploadRecording(formData)).then(response => {
         if (response) {
           setPrediction(response);
           setPredictionPopupVisible(true);
         }
+        setLoading(false); // Stop loading indicator
       });
     }
   }, [formData, dispatch]);
@@ -225,9 +228,12 @@ export default function RecordingScreen({navigation}) {
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        <Text style={styles.title}>
-          {isRecording ? 'Recording...' : 'Ready to Record'}
-        </Text>
+        {/* Hide the "Ready to Record" and "Recording..." text when loading is true */}
+        {!loading && (
+          <Text style={styles.title}>
+            {isRecording ? 'Recording...' : 'Ready to Record'}
+          </Text>
+        )}
 
         {isRecording && (
           <Text style={styles.timerText}>Time left: {timer} seconds</Text>
@@ -281,6 +287,14 @@ export default function RecordingScreen({navigation}) {
               onPress={stopRecording}
               style={styles.stopButton}
             />
+          </View>
+        )}
+
+        {/* Loading Indicator */}
+        {loading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#FF6B6B" />
+            <Text style={styles.loadingText}>Processing your prediction...</Text>
           </View>
         )}
 
@@ -395,6 +409,16 @@ const styles = StyleSheet.create({
   disabled: {
     // backgroundColor: '#ccc',
   },
+  // loadingContainer: {
+  //   marginTop: 30,
+  //   alignItems: 'center',
+  // },
+  // loadingText: {
+  //   marginTop: 10,
+  //   color: '#FF6B6B',
+  //   fontSize: 16,
+  //   fontWeight: 'bold',
+  // },
   modalBackground: {
     flex: 1,
     justifyContent: 'center',
