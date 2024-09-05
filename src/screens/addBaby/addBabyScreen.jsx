@@ -228,6 +228,7 @@ export default function BabyScreen({navigation}) {
           )}
         </View>
       </KeyboardAvoidingView>
+      <HorizontalLine />
 
       <ButtonComponent
             title={showAddBaby ? 'Cancel' : 'Add New Baby'}
