@@ -17,6 +17,7 @@ import {addBabyToUser} from '../../redux/babies/babyActions';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import ButtonComponent from '../../components/button/button';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import HorizontalLine from '../../components/horizontalLine/horizontalLine';
 
 export default function BabyScreen({navigation}) {
   const [name, setName] = useState('');
@@ -102,7 +103,9 @@ export default function BabyScreen({navigation}) {
       />
       <View style={styles.babyInfo}>
         <Text style={styles.babyName}>{item.name}</Text>
-        <Text style={styles.babyDetails}>Birthdate: {item.birthdate.split('T')[0]}</Text>
+        <Text style={styles.babyDetails}>
+          Birthdate: {item.birthdate.split('T')[0]}
+        </Text>
         <Text style={styles.babyDetails}>Gender: {item.gender}</Text>
       </View>
     </TouchableOpacity>
@@ -125,13 +128,7 @@ export default function BabyScreen({navigation}) {
             contentContainerStyle={styles.babiesListContainer}
           />
 
-          <TouchableOpacity
-            onPress={() => setShowAddBaby(!showAddBaby)}
-            style={styles.fixedButton}>
-            <Text style={styles.fixedButtonText}>
-              {showAddBaby ? 'Cancel' : 'Add New Baby'}
-            </Text>
-          </TouchableOpacity>
+        
 
           {showAddBaby && (
             <Animated.View
@@ -231,6 +228,13 @@ export default function BabyScreen({navigation}) {
           )}
         </View>
       </KeyboardAvoidingView>
+
+      <ButtonComponent
+            title={showAddBaby ? 'Cancel' : 'Add New Baby'}
+            onPress={() => setShowAddBaby(!showAddBaby)}
+            style={styles.fixedButton}
+            outlined={true}
+          />
     </ScreenWrapper>
   );
 }
@@ -369,23 +373,10 @@ const styles = StyleSheet.create({
   },
   fixedButton: {
     position: 'absolute',
-    bottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderWidth: 2,  
-    borderColor: '#EF8D7F', 
-    backgroundColor: 'transparent',
-    borderRadius: 10,
-    width: '100%',
+    bottom: 20, 
+    left: 40,
+    right: 40,
+
   },
-  fixedButtonText: {
-    color: '#EF8D7F',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 5,
-  },
-  
+
 });
