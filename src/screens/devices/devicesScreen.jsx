@@ -2,24 +2,20 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
   FlatList,
+  StyleSheet,
 } from 'react-native';
 import {useSelector} from 'react-redux';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomHeader from '../../components/customHeader/customHeader';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
+import Button from '../../components/button/button';
+import HorizontalLine from '../../components/horizontalLine/horizontalLine'; // Importing HorizontalLine component
 
 export default function ConnectedDevicesScreen({navigation}) {
   const [devices, setDevices] = useState([]);
-  const [searchText, setSearchText] = useState('');
   const user = useSelector(state => state.user.user);
 
   useEffect(() => {
-    // Fetch user's connected devices from the backend or state
-    const fetchedDevices = user?.devices || []; // Replace with actual data fetching logic
+    const fetchedDevices = user?.devices || []; 
     setDevices(fetchedDevices);
   }, [user]);
 
@@ -36,11 +32,6 @@ export default function ConnectedDevicesScreen({navigation}) {
           <View style={styles.deviceCard}>
             <Text style={styles.deviceText}>First Device...</Text>
           </View>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => navigation.navigate('AddDeviceScreen')}>
-            <Text style={styles.addButtonText}>Add more devices</Text>
-          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -50,13 +41,21 @@ export default function ConnectedDevicesScreen({navigation}) {
           contentContainerStyle={styles.deviceListContainer}
         />
       )}
+      
+
+      <Button
+        title={'Add more devices'}
+        onPress={() => navigation.navigate('AddDeviceScreen')}
+        style={styles.addButton}
+        outlined={true}
+      />
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
   emptyStateContainer: {
-    paddingTop:40
+    paddingTop: 40,
   },
   deviceCard: {
     width: '100%',
@@ -74,21 +73,13 @@ const styles = StyleSheet.create({
     color: '#959595',
     fontFamily: 'Inter-Medium',
   },
-  addButton: {
-    marginTop: 20, 
-    paddingVertical: 15,
-    paddingHorizontal: 25,
-    backgroundColor: '#EF8D7F',
-    borderRadius: 10,
-  },
-  addButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '500',
-    textAlign: 'center',
-    fontFamily: 'Inter-Medium',
-    
-  },
+  // addButton: {
+  //   position: 'absolute',
+  //   bottom: 20, 
+  //   left: 40,
+  //   right: 40,
+  //   paddingHorizontal: 20,
+  // },
   deviceListContainer: {
     paddingBottom: 20,
   },
