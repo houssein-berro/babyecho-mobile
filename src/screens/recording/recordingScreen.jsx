@@ -409,16 +409,16 @@ const styles = StyleSheet.create({
   disabled: {
     // backgroundColor: '#ccc',
   },
-  // loadingContainer: {
-  //   marginTop: 30,
-  //   alignItems: 'center',
-  // },
-  // loadingText: {
-  //   marginTop: 10,
-  //   color: '#FF6B6B',
-  //   fontSize: 16,
-  //   fontWeight: 'bold',
-  // },
+  loadingContainer: {
+    marginTop: 30,
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#FF6B6B',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   modalBackground: {
     flex: 1,
     justifyContent: 'center',
