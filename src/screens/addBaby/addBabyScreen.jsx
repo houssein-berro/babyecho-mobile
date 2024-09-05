@@ -18,7 +18,6 @@ import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import ButtonComponent from '../../components/button/button';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import HorizontalLine from '../../components/horizontalLine/horizontalLine';
-
 export default function BabyScreen({navigation}) {
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState('');
@@ -128,8 +127,6 @@ export default function BabyScreen({navigation}) {
             contentContainerStyle={styles.babiesListContainer}
           />
 
-        
-
           {showAddBaby && (
             <Animated.View
               style={[
@@ -227,15 +224,16 @@ export default function BabyScreen({navigation}) {
             </Animated.View>
           )}
         </View>
-      </KeyboardAvoidingView>
-      <HorizontalLine />
 
-      <ButtonComponent
-            title={showAddBaby ? 'Cancel' : 'Add New Baby'}
-            onPress={() => setShowAddBaby(!showAddBaby)}
-            style={styles.fixedButton}
-            outlined={true}
-          />
+        <HorizontalLine style={styles.horizontalLine} />
+
+        <ButtonComponent
+          title={showAddBaby ? 'Cancel' : 'Add New Baby'}
+          onPress={() => setShowAddBaby(!showAddBaby)}
+          style={styles.fixedButton}
+          outlined={true}
+        />
+      </KeyboardAvoidingView>
     </ScreenWrapper>
   );
 }
@@ -286,7 +284,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   babyInfo: {
-    marginLeft: 10, // spacing between icon and text
+    marginLeft: 10,
     flex: 1,
   },
   babyName: {
@@ -374,10 +372,14 @@ const styles = StyleSheet.create({
   },
   fixedButton: {
     position: 'absolute',
-    bottom: 20, 
-    left: 40,
-    right: 40,
-
+    bottom: 20,
+    width: '90%',
+    alignSelf: 'center',
   },
-
+  horizontalLine: {
+    position: 'absolute',
+    bottom: 70,
+    width: '90%',
+    alignSelf: 'center',
+  },
 });
