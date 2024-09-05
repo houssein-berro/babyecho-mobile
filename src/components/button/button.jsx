@@ -9,6 +9,7 @@ export default function Button({ title, onPress, outlined, style, textStyle, ico
         outlined ? styles.outlinedButton : styles.filledButton,
         style,
       ]}
+      activeOpacity={0.6}  
       onPress={onPress}
     >
       <View style={styles.content}>
