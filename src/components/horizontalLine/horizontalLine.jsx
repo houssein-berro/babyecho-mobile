@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
-const HorizontalLine = ({ style }) => {
-  return <View style={[styles.line, style]} />;
+const HorizontalLine = ({ bottom }) => {
+  return <View style={[styles.line, { bottom: bottom }]} />;
 };
 
 const styles = StyleSheet.create({
@@ -12,7 +12,6 @@ const styles = StyleSheet.create({
     width: '110%',
     alignSelf: 'center',
     position: 'absolute',
-    bottom: 90
   },
 });
 
