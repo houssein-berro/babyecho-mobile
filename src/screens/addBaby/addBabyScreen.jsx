@@ -11,6 +11,7 @@ import {
   Animated,
   FlatList,
   TouchableOpacity,
+  Keyboard,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {addBabyToUser} from '../../redux/babies/babyActions';
@@ -18,6 +19,7 @@ import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import ButtonComponent from '../../components/button/button';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import HorizontalLine from '../../components/horizontalLine/horizontalLine';
+
 export default function BabyScreen({navigation}) {
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState('');
@@ -25,6 +27,7 @@ export default function BabyScreen({navigation}) {
   const [slideAnim] = useState(new Animated.Value(0));
   const [formOpacity] = useState(new Animated.Value(0));
   const [showAddBaby, setShowAddBaby] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.user);
 
@@ -41,6 +44,20 @@ export default function BabyScreen({navigation}) {
       useNativeDriver: true,
     }).start();
   }, [showAddBaby, slideAnim, formOpacity]);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   const handleAddBaby = () => {
     const gender = isMale ? 'Male' : 'Female';
@@ -225,14 +242,17 @@ export default function BabyScreen({navigation}) {
           )}
         </View>
 
-        <HorizontalLine style={styles.horizontalLine} />
-
-        <ButtonComponent
-          title={showAddBaby ? 'Cancel' : 'Add New Baby'}
-          onPress={() => setShowAddBaby(!showAddBaby)}
-          style={styles.fixedButton}
-          outlined={true}
-        />
+        {!keyboardVisible && (
+          <View style={styles.fixedButtonContainer}>
+            <HorizontalLine bottom={70}/>
+            <ButtonComponent
+              title={showAddBaby ? 'Cancel' : 'Add New Baby'}
+              onPress={() => setShowAddBaby(!showAddBaby)}
+              style={styles.fixedButton}
+              outlined={true}
+            />
+          </View>
+        )}
       </KeyboardAvoidingView>
     </ScreenWrapper>
   );
@@ -301,14 +321,6 @@ const styles = StyleSheet.create({
     color: '#777',
     marginTop: 20,
   },
-  babiesListContainer: {
-    paddingBottom: 20,
-  },
-  noBabiesText: {
-    textAlign: 'center',
-    color: '#777',
-    marginTop: 20,
-  },
   formContainer: {
     backgroundColor: '#f7f8fa',
     padding: 20,
@@ -370,16 +382,14 @@ const styles = StyleSheet.create({
   switch: {
     transform: [{scaleX: 1.5}, {scaleY: 1.5}],
   },
-  fixedButton: {
+  fixedButtonContainer: {
     position: 'absolute',
     bottom: 20,
-    width: '90%',
-    alignSelf: 'center',
+    width: '100%',
+    alignItems: 'center',
   },
-  horizontalLine: {
-    position: 'absolute',
-    bottom: 70,
-    width: '90%',
+  fixedButton: {
+    width: '100%',
     alignSelf: 'center',
   },
 });
