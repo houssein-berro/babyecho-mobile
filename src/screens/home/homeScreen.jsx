@@ -15,13 +15,10 @@ import FontAwesome5 from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function HomeScreen({navigation}) {
   const auth = useSelector(state => state.user.user);
-  console.log(user);
   const [user,setUser] = useState([]);
 
   useEffect(()=>{
-    setUser(auth)
-    console.log('us',user);
-    
+    setUser(auth)    
   },[auth])
   return (
     <ScreenWrapper>
