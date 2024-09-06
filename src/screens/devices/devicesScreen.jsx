@@ -42,7 +42,7 @@ export default function ConnectedDevicesScreen({navigation}) {
         />
       )}
       
-      <HorizontalLine />
+      <HorizontalLine bottom={90}/>
 
       <Button
         title={'Add more devices'}
