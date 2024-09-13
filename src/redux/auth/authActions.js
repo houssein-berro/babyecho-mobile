@@ -8,15 +8,16 @@ import {
   signupStart, 
   signupSuccess, 
   signupFailure,
-  addBabyStart,
-  addBabySuccess,
-  addBabyFailure
+
 } from './authSlice';
 
 // Login action creator
 export const loginUser = (userData) => async (dispatch) => {
   dispatch(loginStart());
   try {
+    console.log('====================================');
+    console.log(BACKEND_URL)
+    console.log('====================================');
     const response = await axios.post(`${BACKEND_URL}/api/auth/login`, userData);
     dispatch(loginSuccess(response.data));
     await AsyncStorage.setItem('token', response?.data.token);
