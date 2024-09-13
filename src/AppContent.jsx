@@ -24,8 +24,9 @@ export default function AppContent() {
       if (isValid) {
         setInitialRoute('Main');
       } else {
-        await AsyncStorage.removeItem('token');
         setInitialRoute('Onboarding');
+      await AsyncStorage.removeItem('token');
+
       }
       setIsLoading(false);
     };
