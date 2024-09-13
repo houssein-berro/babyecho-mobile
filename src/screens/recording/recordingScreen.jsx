@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,11 @@ import {
   PermissionsAndroid,
   Platform,
   Modal,
-  ActivityIndicator,  // Import activity indicator for loading
+  ActivityIndicator,
+  Animated,  // Import Animated for animations
+  Vibration   // Import Vibration for feedback
 } from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
@@ -27,56 +30,33 @@ export default function RecordingScreen({navigation}) {
   const [recordingStopped, setRecordingStopped] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [predictionPopupVisible, setPredictionPopupVisible] = useState(false);
-  const [loading, setLoading] = useState(false); // Loading state for prediction processing
+  const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState('');
   const [timer, setTimer] = useState(7);
   const dispatch = useDispatch();
 
   const user = useSelector(state => state.user.user);
   const userId = user ? user._id : null;
-  const [babyId, setBabyId] = useState();
-
-  useEffect(() => {
-    setBabyId(user?.babies?.[0]?._id);
-  }, [user]);
+  const babies = user ? user.babies : [];
+  const [babyId, setBabyId] = useState(babies.length > 0 ? babies[0]._id : null);
 
   const isRecordingDisabled = !babyId;
 
+  // Animation setup for picker
+  const slideAnim = useRef(new Animated.Value(-100)).current; // Start out of view
+
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      checkAndRequestPermissions();
+    // Only animate the picker when not recording
+    if (!isRecording) {
+      Animated.timing(slideAnim, {
+        toValue: 0,  // Slide into view
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
     }
-  }, []);
+  }, [isRecording]);
 
   const checkAndRequestPermissions = async () => {
-    let writeGranted = false;
-    let readGranted = false;
-    let recordGranted = false;
-
-    if (Platform.Version >= 33) {
-      writeGranted = true;
-      readGranted = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
-      );
-    } else {
-      writeGranted = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      );
-      readGranted = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      );
-    }
-
-    recordGranted = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-    );
-
-    if (!writeGranted || !readGranted || !recordGranted) {
-      await requestPermissions();
-    }
-  };
-
-  const requestPermissions = async () => {
     let permissionsToRequest = [PermissionsAndroid.PERMISSIONS.RECORD_AUDIO];
 
     if (Platform.Version >= 33) {
@@ -91,63 +71,29 @@ export default function RecordingScreen({navigation}) {
     }
 
     try {
-      const granted = await PermissionsAndroid.requestMultiple(
-        permissionsToRequest,
-      );
-
-      const writeGranted =
-        granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] ===
-          PermissionsAndroid.RESULTS.GRANTED || Platform.Version >= 33;
-      const readGranted =
-        granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] ===
-          PermissionsAndroid.RESULTS.GRANTED ||
-        granted[PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO] ===
-          PermissionsAndroid.RESULTS.GRANTED;
-      const recordGranted =
-        granted[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] ===
-        PermissionsAndroid.RESULTS.GRANTED;
+      const granted = await PermissionsAndroid.requestMultiple(permissionsToRequest);
+      const writeGranted = Platform.Version >= 33 || granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] === PermissionsAndroid.RESULTS.GRANTED;
+      const readGranted = Platform.Version >= 33 || granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] === PermissionsAndroid.RESULTS.GRANTED || granted[PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO] === PermissionsAndroid.RESULTS.GRANTED;
+      const recordGranted = granted[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === PermissionsAndroid.RESULTS.GRANTED;
 
       if (!writeGranted || !readGranted || !recordGranted) {
-        setModalVisible(true); // Show modal if permissions aren't granted
+        setModalVisible(true);
       }
     } catch (err) {
       console.warn(err);
-      setModalVisible(true); // Show modal on error
+      setModalVisible(true);
     }
   };
 
   const startRecording = async () => {
-    const writeGranted =
-      Platform.Version >= 33 ||
-      (await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      ));
-    const readGranted =
-      Platform.Version >= 33 ||
-      (await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      )) ||
-      (await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
-      ));
-    const recordGranted = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-    );
-
-    if (!writeGranted || !readGranted || !recordGranted) {
-      await requestPermissions();
-      return;
-    }
-
     try {
       const result = await audioRecorderPlayer.startRecorder();
       setIsRecording(true);
       setDots('');
       setRecordingStopped(false);
-      setTimer(7); // Reset the timer to 7 seconds
-      audioRecorderPlayer.addRecordBackListener(e => {
-        setRecordSecs(e.currentPosition);
-      });
+      setTimer(7);
+
+      audioRecorderPlayer.addRecordBackListener(e => setRecordSecs(e.currentPosition));
 
       const countdown = setInterval(() => {
         setTimer(prev => prev - 1);
@@ -155,9 +101,8 @@ export default function RecordingScreen({navigation}) {
 
       setTimeout(async () => {
         await stopRecording();
-        clearInterval(countdown); // Stop the countdown timer when recording stops
+        clearInterval(countdown);
       }, 7000);
-
     } catch (error) {
       console.log('Failed to start recording', error);
     }
@@ -194,7 +139,7 @@ export default function RecordingScreen({navigation}) {
       setDots('');
       setRecordSecs(0);
       setRecordingStopped(false);
-      setTimer(7); // Reset the timer
+      setTimer(7);
     } catch (error) {
       console.log('Failed to cancel recording', error);
     }
@@ -203,9 +148,7 @@ export default function RecordingScreen({navigation}) {
   useEffect(() => {
     let interval;
     if (isRecording) {
-      interval = setInterval(() => {
-        setDots(prev => (prev.length < 3 ? prev + '.' : ''));
-      }, 500);
+      interval = setInterval(() => setDots(prev => (prev.length < 3 ? prev + '.' : '')), 500);
     } else {
       setDots('');
     }
@@ -214,13 +157,13 @@ export default function RecordingScreen({navigation}) {
 
   useEffect(() => {
     if (formData) {
-      setLoading(true); // Start loading indicator
+      setLoading(true);
       dispatch(uploadRecording(formData)).then(response => {
         if (response) {
           setPrediction(response);
           setPredictionPopupVisible(true);
         }
-        setLoading(false); // Stop loading indicator
+        setLoading(false);
       });
     }
   }, [formData, dispatch]);
@@ -228,7 +171,33 @@ export default function RecordingScreen({navigation}) {
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        {/* Hide the "Ready to Record" and "Recording..." text when loading is true */}
+        {/* Conditionally render baby picker only when not recording */}
+        {!isRecording && (
+          <Animated.View style={[styles.babyPickerContainer, {transform: [{translateY: slideAnim}]}]}>
+            <TouchableOpacity
+              onPress={() => {
+                Vibration.vibrate(50);
+              }}
+              activeOpacity={0.8}
+              style={styles.touchablePickerArea}
+            >
+              <Text style={styles.babyLabel}>Select Baby</Text>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={babyId}
+                  onValueChange={(itemValue) => setBabyId(itemValue)}
+                  style={styles.picker}
+                  dropdownIconColor={'#FF6B6B'}
+                >
+                  {babies.map(baby => (
+                    <Picker.Item key={baby._id} label={baby.name} value={baby._id} />
+                  ))}
+                </Picker>
+              </View>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+
         {!loading && (
           <Text style={styles.title}>
             {isRecording ? 'Recording...' : 'Ready to Record'}
@@ -290,7 +259,6 @@ export default function RecordingScreen({navigation}) {
           </View>
         )}
 
-        {/* Loading Indicator */}
         {loading && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#FF6B6B" />
@@ -298,7 +266,6 @@ export default function RecordingScreen({navigation}) {
           </View>
         )}
 
-        {/* Modal for displaying AI prediction */}
         <Modal
           transparent={true}
           visible={predictionPopupVisible}
@@ -318,13 +285,13 @@ export default function RecordingScreen({navigation}) {
             </View>
           </View>
         </Modal>
-      </View>
 
-      <CustomModal
-        isVisible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onAddBaby={() => navigation.navigate('AddBaby')}
-      />
+        <CustomModal
+          isVisible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onAddBaby={() => navigation.navigate('AddBaby')}
+        />
+      </View>
     </ScreenWrapper>
   );
 }
@@ -332,15 +299,44 @@ export default function RecordingScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    paddingTop: 40,
+  },
+  babyPickerContainer: {
+    width: '100%',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 2,  // Add a shadow effect to make it pop
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    marginBottom: 20,
+  },
+  pickerWrapper: {
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: '#FF6B6B',
+  },
+  picker: {
+    flex: 1,
+    color: '#333',
+  },
+  babyLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FF6B6B',
+    marginBottom: 5,
   },
   title: {
     fontSize: 23,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 40,
+    alignSelf: 'center'
   },
   timerText: {
     fontSize: 18,
@@ -407,7 +403,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   disabled: {
-    // backgroundColor: '#ccc',
+    opacity: 0.5,
   },
   loadingContainer: {
     marginTop: 30,
