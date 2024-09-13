@@ -1,24 +1,30 @@
 import axios from 'axios';
-import { uploadStart, uploadSuccess, uploadFailure } from './recordingSlice';
-import { BACKEND_URL, ML_URL } from '@env';  // ML_URL is not needed here, Node.js will handle it
+import {uploadStart, uploadSuccess, uploadFailure} from './recordingSlice';
+import {BACKEND_URL, ML_URL, ESP_WS_URL} from '@env'; // ML_URL is not needed here, Node.js will handle it
 
-export const uploadRecording = (formData) => async (dispatch) => {
+export const uploadRecording = formData => async dispatch => {
   dispatch(uploadStart());
 
   try {
-    const response = await axios.post(`${BACKEND_URL}/api/recordings`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    const response = await axios.post(
+      `${BACKEND_URL}/api/recordings`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       },
-    });
-    const { recordingId } = response.data; 
-    const audioFileField = formData._parts.find(part => part[0] === 'audioFile');
+    );
+    const {recordingId} = response.data;
+    const audioFileField = formData._parts.find(
+      part => part[0] === 'audioFile',
+    );
 
     if (!audioFileField) {
       throw new Error('audioFile field not found in formData');
     }
 
-    const audioFile = audioFileField[1];  
+    const audioFile = audioFileField[1];
     const mlFormData = new FormData();
     mlFormData.append('file', {
       uri: audioFile.uri,
@@ -35,9 +41,32 @@ export const uploadRecording = (formData) => async (dispatch) => {
       resultDetails: MLresponse.data.prediction,
     });
 
-    dispatch(uploadSuccess({ mlPrediction: MLresponse?.data?.prediction }));
-    return MLresponse.data.prediction;  
+    dispatch(uploadSuccess({mlPrediction: MLresponse?.data?.prediction}));
+    if (MLresponse.data.prediction == 'tired') {
+      sendTurnOffLedCommand(); // Function to send the command to the ESP
+    }
+    return MLresponse.data.prediction;
   } catch (error) {
     dispatch(uploadFailure(error.message));
   }
+};
+
+const sendTurnOffLedCommand = () => {
+  console.log('====================================');
+  console.log(ESP_WS_URL);
+  console.log('====================================');
+  const socket = new WebSocket(ESP_WS_URL); 
+
+  socket.onopen = () => {
+    console.log('Connected to ESP WebSocket');
+    socket.send('LED_OFF'); 
+  };
+
+  socket.onerror = error => {
+    console.log('WebSocket error:', error.message);
+  };
+
+  socket.onclose = () => {
+    console.log('WebSocket connection closed');
+  };
 };
