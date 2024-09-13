@@ -20,7 +20,7 @@ export default function HomeScreen({ navigation }) {
     <ScreenWrapper>
       <View style={styles.header}>
         <Text style={styles.welcomeText}>
-          Hi, {auth ? auth.username : 'User'}!
+          Hi, {auth ? auth.username : 'User'}
         </Text>
         <Text style={styles.subtitle}>What would you like to do today?</Text>
       </View>
