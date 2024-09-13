@@ -9,9 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
-  Animated,
   Keyboard,
-  Dimensions,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
@@ -112,56 +111,66 @@ export default function ConnectedDevicesScreen({ navigation }) {
             transparent={true}
             visible={showAddDevice}
             onRequestClose={toggleForm}>
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContent}>
-                <Text style={styles.formTitle}>Add New Device</Text>
+            {/* Detect touch outside the modal content */}
+            <TouchableWithoutFeedback onPress={toggleForm}>
+              <View style={styles.modalOverlay}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.modalContent}>
 
-                <Text style={styles.label}>Device Name</Text>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter device name"
-                    value={deviceName}
-                    onChangeText={setDeviceName}
-                    placeholderTextColor="#9E9E9E"
-                  />
-                  <FontAwesome
-                    name="laptop"
-                    size={20}
-                    color="#9E9E9E"
-                    style={styles.icon}
-                  />
-                </View>
+                    {/* "X" Cancel Icon */}
+                    <TouchableOpacity
+                      style={styles.closeButton}
+                      onPress={toggleForm}>
+                      <FontAwesome name="close" size={24} color="#9E9E9E" />
+                    </TouchableOpacity>
 
-                <Text style={styles.label}>IP Address</Text>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter device IP address"
-                    value={ipAddress}
-                    onChangeText={setIpAddress}
-                    placeholderTextColor="#9E9E9E"
-                    keyboardType="numeric"
-                  />
-                  <FontAwesome
-                    name="gears"
-                    size={20}
-                    color="#9E9E9E"
-                    style={styles.icon}
-                  />
-                </View>
+                    <Text style={styles.formTitle}>Add New Device</Text>
 
-                {/* Buttons side by side */}
-                <View style={styles.buttonRow}>
-                  <View style={styles.buttonContainer}>
-                    <ButtonComponent title="Add Device" onPress={handleAddDevice} />
+                    <Text style={styles.label}>Device Name</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Enter device name"
+                        value={deviceName}
+                        onChangeText={setDeviceName}
+                        placeholderTextColor="#9E9E9E"
+                      />
+                      <FontAwesome
+                        name="laptop"
+                        size={20}
+                        color="#9E9E9E"
+                        style={styles.icon}
+                      />
+                    </View>
+
+                    <Text style={styles.label}>IP Address</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Enter device IP address"
+                        value={ipAddress}
+                        onChangeText={setIpAddress}
+                        placeholderTextColor="#9E9E9E"
+                        keyboardType="numeric"
+                      />
+                      <FontAwesome
+                        name="gears"
+                        size={20}
+                        color="#9E9E9E"
+                        style={styles.icon}
+                      />
+                    </View>
+
+                    {/* Add Device Button */}
+                    <View style={styles.buttonRow}>
+                      <View style={styles.buttonContainer}>
+                        <ButtonComponent title="Add Device" onPress={handleAddDevice} />
+                      </View>
+                    </View>
                   </View>
-                  <View style={styles.buttonContainer}>
-                    <ButtonComponent title="Cancel" onPress={toggleForm} outlined={true} />
-                  </View>
-                </View>
+                </TouchableWithoutFeedback>
               </View>
-            </View>
+            </TouchableWithoutFeedback>
           </Modal>
 
         </View>
@@ -238,6 +247,10 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
   },
+  closeButton: {
+    alignSelf: 'flex-end', // Position the close button at the top right
+    marginBottom: 10,
+  },
   formTitle: {
     fontSize: 18,
     fontWeight: '600',
@@ -272,7 +285,7 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginTop: 20,
   },
   buttonContainer: {
