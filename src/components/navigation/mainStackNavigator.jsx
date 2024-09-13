@@ -105,7 +105,10 @@ export default function MainTabNavigator() {
       initialRouteName="Home"
       screenOptions={({ route }) => ({
         tabBarHideOnKeyboard: true,
-
+        tabBarActiveTintColor: "#EF8D7F",
+        tabBarInactiveTintColor: "gray",
+        tabBarShowLabel: true,
+        tabBarStyle: [{ display: 'flex' }, null],
         tabBarIcon: ({ color, size, focused }) => {
           let iconName;
 
@@ -141,11 +144,7 @@ export default function MainTabNavigator() {
         },
        
       })}
-      tabBarOptions={{
-        activeTintColor: '#EF8D7F',
-        inactiveTintColor: 'gray',
-        showLabel: true,
-      }}
+  
     >
       <Tab.Screen
         name="Home"
