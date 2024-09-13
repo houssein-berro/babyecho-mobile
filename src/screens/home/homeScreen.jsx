@@ -6,33 +6,26 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import Button from '../../components/button/button';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function HomeScreen({navigation}) {
+export default function HomeScreen({ navigation }) {
   const auth = useSelector(state => state.user.user);
-  const [user,setUser] = useState([]);
 
-  useEffect(()=>{
-    setUser(auth)    
-  },[auth])
   return (
     <ScreenWrapper>
-      {/* Welcome Message */}
       <View style={styles.header}>
         <Text style={styles.welcomeText}>
-          Hi, {user ? user.username : 'User'}!
+          Hi, {auth ? auth.username : 'User'}!
         </Text>
         <Text style={styles.subtitle}>What would you like to do today?</Text>
       </View>
 
-      {/* Scrollable Content */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Navigation Links */}
         <View style={styles.buttonGroup}>
           <Button
             title="Add member"
@@ -41,15 +34,14 @@ export default function HomeScreen({navigation}) {
             icon={<FontAwesome name="plus" size={20} color="#fff" />}
           />
           <Button
-            title="Profile"
+            title="Record Audio"
             outlined={true}
-            onPress={() => navigation.navigate('Profile')}
+            onPress={() => navigation.navigate('Recording')}
             style={[styles.button, styles.outlinedButton]}
-            icon={<FontAwesome name="user" size={20} color="#EF8D7F" />}
+            icon={<FontAwesome5 name="microphone" size={20} color="#EF8D7F" />}
           />
         </View>
 
-        {/* Featured Content */}
         <Text style={styles.sectionTitle}>Featured Content</Text>
         <View style={styles.featuredContent}>
           <TouchableOpacity style={styles.featuredItem}>
@@ -82,7 +74,6 @@ export default function HomeScreen({navigation}) {
           </TouchableOpacity>
         </View>
 
-        {/* Promotions or Announcements */}
         <Text style={styles.sectionTitle}>Promotions</Text>
         <View style={styles.promotions}>
           <TouchableOpacity style={styles.promotionItem}>
