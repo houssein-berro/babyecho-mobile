@@ -8,7 +8,7 @@ import {
   Switch,
   KeyboardAvoidingView,
   Platform,
-  Animated,
+  Modal,
   FlatList,
   TouchableOpacity,
   Keyboard,
@@ -24,26 +24,10 @@ export default function BabyScreen({navigation}) {
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState('');
   const [isMale, setIsMale] = useState(true);
-  const [slideAnim] = useState(new Animated.Value(0));
-  const [formOpacity] = useState(new Animated.Value(0));
   const [showAddBaby, setShowAddBaby] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.user);
-
-  useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: showAddBaby ? 1 : 0,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-
-    Animated.timing(formOpacity, {
-      toValue: showAddBaby ? 1 : 0,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-  }, [showAddBaby, slideAnim, formOpacity]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -144,102 +128,104 @@ export default function BabyScreen({navigation}) {
             contentContainerStyle={styles.babiesListContainer}
           />
 
-          {showAddBaby && (
-            <Animated.View
-              style={[
-                styles.formContainer,
-                {
-                  opacity: formOpacity,
-                  transform: [
-                    {
-                      translateY: slideAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [600, -95],
-                      }),
-                    },
-                  ],
-                },
-              ]}>
-              <Text style={styles.formTitle}>Add Your Baby</Text>
+          {/* Add Baby Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={showAddBaby}
+            onRequestClose={() => setShowAddBaby(false)}>
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.formTitle}>Add Your Baby</Text>
 
-              <Text style={styles.label}>Name</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter baby's name"
-                  value={name}
-                  onChangeText={setName}
-                  placeholderTextColor="#9E9E9E"
-                />
-                <FontAwesome
-                  name="user"
-                  size={20}
-                  color="#9E9E9E"
-                  style={styles.icon}
-                />
-              </View>
-
-              <Text style={styles.label}>Birthdate</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  value={birthdate}
-                  onChangeText={handleBirthdateChange}
-                  placeholder="YYYY-MM-DD"
-                  maxLength={10}
-                  keyboardType="numeric"
-                  placeholderTextColor="#9E9E9E"
-                />
-                <FontAwesome
-                  name="calendar"
-                  size={20}
-                  color="#9E9E9E"
-                  style={styles.icon}
-                />
-              </View>
-
-              <Text style={styles.label}>Gender</Text>
-              <View style={styles.switchContainer}>
-                <View style={styles.switchLabelContainer}>
-                  <FontAwesome
-                    name="male"
-                    size={24}
-                    color={isMale ? '#61dbfb' : '#ccc'}
+                <Text style={styles.label}>Name</Text>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter baby's name"
+                    value={name}
+                    onChangeText={setName}
+                    placeholderTextColor="#9E9E9E"
                   />
-                  <Text
-                    style={[
-                      styles.switchLabel,
-                      {color: isMale ? '#61dbfb' : '#ccc'},
-                    ]}>
-                    Boy
-                  </Text>
-                </View>
-                <Switch
-                  value={isMale}
-                  onValueChange={setIsMale}
-                  thumbColor={isMale ? '#61dbfb' : '#f7b7d2'}
-                  trackColor={{false: '#f7b7d2', true: '#61dbfb'}}
-                  style={styles.switch}
-                />
-                <View style={styles.switchLabelContainer}>
                   <FontAwesome
-                    name="female"
-                    size={24}
-                    color={!isMale ? '#f7b7d2' : '#ccc'}
+                    name="user"
+                    size={20}
+                    color="#9E9E9E"
+                    style={styles.icon}
                   />
-                  <Text
-                    style={[
-                      styles.switchLabel,
-                      {color: !isMale ? '#f7b7d2' : '#ccc'},
-                    ]}>
-                    Girl
-                  </Text>
+                </View>
+
+                <Text style={styles.label}>Birthdate</Text>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    value={birthdate}
+                    onChangeText={handleBirthdateChange}
+                    placeholder="YYYY-MM-DD"
+                    maxLength={10}
+                    keyboardType="numeric"
+                    placeholderTextColor="#9E9E9E"
+                  />
+                  <FontAwesome
+                    name="calendar"
+                    size={20}
+                    color="#9E9E9E"
+                    style={styles.icon}
+                  />
+                </View>
+
+                <Text style={styles.label}>Gender</Text>
+                <View style={styles.switchContainer}>
+                  <View style={styles.switchLabelContainer}>
+                    <FontAwesome
+                      name="male"
+                      size={24}
+                      color={isMale ? '#61dbfb' : '#ccc'}
+                    />
+                    <Text
+                      style={[
+                        styles.switchLabel,
+                        {color: isMale ? '#61dbfb' : '#ccc'},
+                      ]}>
+                      Boy
+                    </Text>
+                  </View>
+                  <Switch
+                    value={isMale}
+                    onValueChange={setIsMale}
+                    thumbColor={isMale ? '#61dbfb' : '#f7b7d2'}
+                    trackColor={{false: '#f7b7d2', true: '#61dbfb'}}
+                    style={styles.switch}
+                  />
+                  <View style={styles.switchLabelContainer}>
+                    <FontAwesome
+                      name="female"
+                      size={24}
+                      color={!isMale ? '#f7b7d2' : '#ccc'}
+                    />
+                    <Text
+                      style={[
+                        styles.switchLabel,
+                        {color: !isMale ? '#f7b7d2' : '#ccc'},
+                      ]}>
+                      Girl
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Buttons side by side */}
+                <View style={styles.buttonRow}>
+                  <View style={styles.buttonContainer}>
+                    <ButtonComponent title="Add Baby" onPress={handleAddBaby} />
+                  </View>
+                  <View style={styles.buttonContainer}>
+                    <ButtonComponent title="Cancel" onPress={() => setShowAddBaby(false)} outlined={true} />
+                  </View>
                 </View>
               </View>
+            </View>
+          </Modal>
 
-              <ButtonComponent title="Add Baby" onPress={handleAddBaby} />
-            </Animated.View>
-          )}
         </View>
 
         {!keyboardVisible && (
@@ -264,28 +250,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingBottom: 40,
     paddingTop: 40,
-  },
-  screenTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  toggleButton: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    backgroundColor: '#EF8D7F',
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  toggleButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    marginRight: 5,
   },
   babiesListContainer: {
     paddingBottom: 20,
@@ -321,11 +285,17 @@ const styles = StyleSheet.create({
     color: '#777',
     marginTop: 20,
   },
-  formContainer: {
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  modalContent: {
+    width: '90%',
     backgroundColor: '#f7f8fa',
-    padding: 20,
+    padding: 15,
     borderRadius: 15,
-    marginTop: 20,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
@@ -333,17 +303,17 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   formTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '600',
     color: '#424242',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 15, // Reduced margin between title and form elements
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#555',
-    marginBottom: 5,
-    marginTop: 15,
+    marginBottom: 3, // Reduced margin between label and input
+    marginTop: 5, // Reduced space above labels
   },
   inputContainer: {
     flexDirection: 'row',
@@ -353,34 +323,43 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#FAFAFA',
     paddingHorizontal: 10,
-    marginBottom: 15,
+    marginBottom: 8, // Reduced space between input fields
   },
   icon: {
     marginRight: 10,
   },
   input: {
     flex: 1,
-    paddingVertical: 14,
-    fontSize: 16,
+    paddingVertical: 10,
+    fontSize: 14,
     color: '#333',
   },
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10,
-    marginBottom: 20,
+    marginTop: 8, // Reduced space between switches and other components
+    marginBottom: 15, // Reduced bottom margin before buttons
   },
   switchLabelContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   switchLabel: {
-    fontSize: 16,
+    fontSize: 14,
     marginLeft: 8,
   },
   switch: {
     transform: [{scaleX: 1.5}, {scaleY: 1.5}],
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 15, // Reduced top margin before buttons
+  },
+  buttonContainer: {
+    flex: 1,
+    marginHorizontal: 5,
   },
   fixedButtonContainer: {
     position: 'absolute',
