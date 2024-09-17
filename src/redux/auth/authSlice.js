@@ -28,7 +28,7 @@ const authSlice = createSlice({
       state.error = null;
     },
     signupSuccess(state, action) {
-      state.user = action.payload;
+      state.user = action.payload.newUser;
       state.loading = false;
     },
     signupFailure(state, action) {
@@ -46,35 +46,40 @@ const authSlice = createSlice({
       state.error = null;
     },
     addBabySuccess(state, action) {
-      // If the response contains a `babies` array, extract the last added baby
       const newBaby = action.payload.babies[action.payload.babies.length - 1];
       
       state.user = {
         ...state.user,
-        babies: [...state.user.babies, newBaby]  // Add only the new baby
+        babies: [...state.user.babies, newBaby]  
       };
-    }
-    ,
-    
-    
+    },
     addBabyFailure(state, action) {
       state.error = action.payload;
       state.loading = false;
     },
+    logoutSuccess(state) {
+      state.user = null;
+      state.loading = false;
+      state.error = null;
+    },
+    logoutFailure(state, action) {
+      state.error = action.payload;
+    },
   }
 });
 
-export const { 
-    loginStart, 
-    loginSuccess, 
-    loginFailure, 
-    signupStart, 
-    signupSuccess, 
-    signupFailure, 
-    addBabyFailure,
-    addBabySuccess,
-    addBabyStart  
-
+export const {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+  signupStart,
+  signupSuccess,
+  signupFailure,
+  addBabyFailure,
+  addBabySuccess,
+  addBabyStart,
+  logoutSuccess,   
+  logoutFailure,   
 } = authSlice.actions;
 
 export default authSlice.reducer;
