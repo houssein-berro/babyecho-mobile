@@ -8,7 +8,8 @@ export default function ScreenWrapper({ children, style }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal:  40,
+    paddingTop:  20,
+    paddingHorizontal:40,
     backgroundColor: '#FFFFFF', 
   },
 });
