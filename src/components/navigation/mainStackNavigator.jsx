@@ -172,12 +172,12 @@ export default function MainTabNavigator() {
       <Tab.Screen
         name="Birthdays"
         component={BirthdayStack}
-        options={{ headerShown: false }} // Birthdays with custom header
+        options={{ headerShown: false }} 
       />
       <Tab.Screen
         name="AddBaby"
         component={BabyStack}
-        options={{ headerShown: false }} // AddBaby with navigation to BabyRecordingsScreen
+        options={{ headerShown: false }}
       />
     </Tab.Navigator>
   );
