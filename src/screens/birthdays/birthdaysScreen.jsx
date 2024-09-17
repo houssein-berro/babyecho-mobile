@@ -99,7 +99,6 @@ function BirthdayCard({ baby, handleSetReminder }) {
     </Animated.View>
   );
 }
-
 export default function BirthdaysCountdownScreen({ navigation }) {
   const babies = useSelector(state => state.user.user.babies || []);
   const [countdowns, setCountdowns] = useState([]);
@@ -148,7 +147,6 @@ export default function BirthdaysCountdownScreen({ navigation }) {
       resolve();
     });
 
-    // Use Promise.all to ensure both data fetching and the 1-second delay are finished
     Promise.all([minLoadTime, fetchData]).then(() => {
       setLoading(false); 
       setShowLoader(false); 
@@ -188,6 +186,12 @@ export default function BirthdaysCountdownScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
+              <LottieView
+                source={require('../../assets/public/nothing.json')}
+                autoPlay
+                loop
+                style={styles.lottieNothing}
+              />
               <Text style={styles.emptyText}>No birthdays to display.</Text>
             </View>
           }
@@ -315,6 +319,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     color: '#666',
+    marginTop: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -323,6 +328,11 @@ const styles = StyleSheet.create({
   },
   lottie: {
     width: 200,
+    height: 200,
+  },
+  lottieNothing: {
+    width: 200,
+    marginRight:30,
     height: 200,
   },
 });
