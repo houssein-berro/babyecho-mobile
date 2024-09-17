@@ -7,9 +7,12 @@ import {
   loginFailure, 
   signupStart, 
   signupSuccess, 
-  signupFailure,
-
+  signupFailure, 
+  addBabyFailure,
+  addBabySuccess,
+  addBabyStart  // Add this to your import
 } from './authSlice';
+
 
 // Login action creator
 export const loginUser = (userData) => async (dispatch) => {
@@ -57,3 +60,30 @@ export const validateToken = () => async (dispatch) => {
   }
 };
 
+export const addBabyToUser = (userId, babyData) => async (dispatch) => {    
+  dispatch(addBabyStart());
+  try {
+    const token = await AsyncStorage.getItem('token');
+    console.log(token);
+
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+
+    const response = await axios.post(
+      `${BACKEND_URL}/api/users/add-baby/${userId}`,
+      babyData, 
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("API Response for added baby:", response.data);  // Ensure it includes all fields
+
+
+    dispatch(addBabySuccess(response.data));
+  } catch (error) {
+    dispatch(addBabyFailure(error.response?.data?.message || error.message || 'Failed to add baby'));
+  }
+};
