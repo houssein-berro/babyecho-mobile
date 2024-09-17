@@ -41,19 +41,39 @@ const authSlice = createSlice({
     loadUser(state, action) {
       state.user = action.payload;
     },
-
+    addBabyStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    addBabySuccess(state, action) {
+      // If the response contains a `babies` array, extract the last added baby
+      const newBaby = action.payload.babies[action.payload.babies.length - 1];
+      
+      state.user = {
+        ...state.user,
+        babies: [...state.user.babies, newBaby]  // Add only the new baby
+      };
+    }
+    ,
+    
+    
+    addBabyFailure(state, action) {
+      state.error = action.payload;
+      state.loading = false;
+    },
   }
 });
 
 export const { 
-  loginStart, 
-  loginSuccess, 
-  loginFailure, 
-  signupStart, 
-  signupSuccess, 
-  signupFailure, 
-  logout, 
-  loadUser,
+    loginStart, 
+    loginSuccess, 
+    loginFailure, 
+    signupStart, 
+    signupSuccess, 
+    signupFailure, 
+    addBabyFailure,
+    addBabySuccess,
+    addBabyStart  
 
 } = authSlice.actions;
 
