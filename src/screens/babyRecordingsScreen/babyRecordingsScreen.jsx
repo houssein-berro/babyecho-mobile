@@ -15,7 +15,7 @@ import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useColorScheme } from 'react-native';
-import LottieView from 'lottie-react-native'; // Import LottieView
+import LottieView from 'lottie-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -72,7 +72,7 @@ export default function BabyRecordingsScreen({ route, navigation }) {
   const { recordings, status, error } = useSelector((state) => state.recordings);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [showLoader, setShowLoader] = useState(true); // Control for loader state
+  const [showLoader, setShowLoader] = useState(true);
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
 
@@ -80,20 +80,19 @@ export default function BabyRecordingsScreen({ route, navigation }) {
     try {
       await dispatch(fetchRecordingsByBaby(baby._id));
     } catch (err) {
-      // Error handling can be expanded here if needed
     }
   }, [dispatch, baby._id]);
 
   useEffect(() => {
-    const minLoadTime = new Promise(resolve => setTimeout(resolve, 1000)); // Minimum 1 second delay
+    const minLoadTime = new Promise(resolve => setTimeout(resolve, 1000)); 
     const fetchData = fetchRecordings();
 
     Promise.all([minLoadTime, fetchData]).then(() => {
-      setShowLoader(false); // Hide loader after both data is fetched and 1 second has passed
+      setShowLoader(false);
     });
 
     return () => {
-      setShowLoader(false); // Ensure loader is stopped on unmount
+      setShowLoader(false);
     };
   }, [fetchRecordings]);
 
@@ -162,7 +161,7 @@ export default function BabyRecordingsScreen({ route, navigation }) {
           // Show Lottie animation when loading
           <View style={styles.loaderContainer}>
             <LottieView
-              source={require('../../assets/public/loading.json')} // Lottie animation path
+              source={require('../../assets/public/loading.json')}
               autoPlay
               loop
               style={styles.lottie}
@@ -196,130 +195,3 @@ export default function BabyRecordingsScreen({ route, navigation }) {
     </ScreenWrapper>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingBottom: 10,
-  },
-  containerDark: {
-    backgroundColor: '#121212',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  backButton: {
-    padding: 10,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#333',
-    flex: 1,
-    textAlign: 'center',
-  },
-  titleDark: {
-    color: '#fff',
-  },
-  placeholder: {
-    width: 44, // To balance the space taken by the back button
-  },
-  totalRecordings: {
-    fontSize: 16,
-    fontWeight: '500',
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#666',
-  },
-  totalRecordingsDark: {
-    color: '#ccc',
-  },
-  recordingCard: {
-    marginBottom: 15,
-    borderRadius: 15,
-    backgroundColor: '#fff',
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 3 },
-    padding: 15,
-  },
-  recordingCardInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  iconContainer: {
-    backgroundColor: '#EF8D7F',
-    padding: 12,
-    borderRadius: 50,
-    marginRight: 16,
-  },
-  recordingInfo: {
-    flex: 1,
-  },
-  recordingPrediction: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#EF8D7F',
-    marginBottom: 4,
-  },
-  recordingDate: {
-    fontSize: 14,
-    color: '#666',
-  },
-  noRecordingsText: {
-    textAlign: 'center',
-    color: '#777',
-    marginTop: 20,
-    fontSize: 16,
-  },
-  errorText: {
-    textAlign: 'center',
-    color: '#D32F2F',
-    marginTop: 10,
-    fontSize: 16,
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  lottie: {
-    width: 200,
-    height: 200,
-  },
-  listContent: {
-    paddingBottom: 20,
-    paddingHorizontal: 10,
-  },
-  listContentEmpty: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  separator: {
-    height: 12,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    marginTop: 50,
-  },
-  errorContainer: {
-    alignItems: 'center',
-    marginTop: 50,
-  },
-  retryButton: {
-    marginTop: 20,
-    backgroundColor: '#EF8D7F',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-});
