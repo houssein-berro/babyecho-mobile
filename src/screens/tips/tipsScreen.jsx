@@ -10,7 +10,7 @@ import {
   UIManager,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomHeader from '../../components/customHeader/customHeader'; // Adjust the path according to your project structure
+import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental &&
@@ -44,11 +44,40 @@ export default function ParentingTipsScreen() {
         'Feed your baby on demand and pay attention to hunger cues for a happier feeding experience.',
       icon: 'cutlery',
     },
+    {
+      title: 'Bonding Time',
+      content:
+        'Spend time cuddling, talking, and interacting with your baby to strengthen your bond.',
+      icon: 'heart',
+    },
+    {
+      title: 'Tummy Time',
+      content:
+        'Give your baby tummy time every day to strengthen their neck and shoulder muscles.',
+      icon: 'child',
+    },
+    {
+      title: 'Baby Proofing',
+      content:
+        'Ensure a safe home environment by covering sharp edges and securing hazardous items.',
+      icon: 'shield',
+    },
+    {
+      title: 'Diaper Care',
+      content:
+        'Change diapers regularly and apply gentle baby powder or cream to avoid rashes.',
+      icon: 'flask',
+    },
+    {
+      title: 'Introducing Solids',
+      content:
+        'At around 6 months, begin introducing solid foods to complement breastfeeding or formula.',
+      icon: 'apple',
+    },
   ];
 
   return (
-    <View>
-      <CustomHeader title="Tips" />
+    <ScreenWrapper>
       <ScrollView contentContainerStyle={styles.container}>
         {tips.map((tip, index) => (
           <View key={index} style={styles.accordionContainer}>
@@ -73,15 +102,12 @@ export default function ParentingTipsScreen() {
           </View>
         ))}
       </ScrollView>
-    </View>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
-    height:'100%',
-    padding: 40,
     backgroundColor: '#fff',
   },
   accordionContainer: {
@@ -101,7 +127,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     paddingHorizontal: 10,
-    borderRadius:  8,
+    borderRadius: 8,
   },
   titleWithIcon: {
     flexDirection: 'row',
