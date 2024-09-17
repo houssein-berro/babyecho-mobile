@@ -24,10 +24,12 @@ export default function SignupScreen({ navigation }) {
   const dispatch = useDispatch();
   const { loading, error, user } = useSelector(state => state.user);
 
-  const handleSignup = userData => {
-    dispatch(signupUser(userData));
+  const handleSignup = async (userData) => {
+    const success = await dispatch(signupUser(userData));
+    if (success) {
+      navigation.replace('Main');
+    }
   };
-
   useEffect(() => {
     Animated.timing(slideAnim, {
       toValue: 0,
@@ -38,7 +40,7 @@ export default function SignupScreen({ navigation }) {
 
   useEffect(() => {
     if (user) {
-      navigation.replace('AddBaby');
+      navigation.replace('Main');
     }
   }, [user, navigation]);
 
