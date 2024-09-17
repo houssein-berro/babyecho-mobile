@@ -36,7 +36,6 @@ export default function BabyScreen({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector(state => state.user?.user);
 
-
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -135,8 +134,6 @@ export default function BabyScreen({ navigation }) {
 
   const renderBabyItem = ({ item, index }) => {
     const animatedWidth = new Animated.Value(0);
-    console.log('Rendering baby item:', item); 
-
     return (
       <Pressable
         style={[styles.babyCard, { backgroundColor: '#fff' }]}
@@ -186,7 +183,17 @@ export default function BabyScreen({ navigation }) {
                 item?._id ? item._id.toString() : index.toString()
               }
               ListEmptyComponent={
-                <Text style={styles.noBabiesText}>No babies added yet.</Text>
+                <View style={styles.emptyContainer}>
+                  <LottieView
+                    source={require('../../assets/public/nothing.json')} // Your "No Data" Lottie animation
+                    autoPlay
+                    loop
+                    style={styles.lottieNothing}
+                  />
+                  <Text style={styles.emptyText}>
+                    No babies added yet.
+                  </Text>
+                </View>
               }
               contentContainerStyle={styles.babiesListContainer}
             />
@@ -209,7 +216,6 @@ export default function BabyScreen({ navigation }) {
 
                     <Text style={styles.formTitle}>Add Your Baby</Text>
 
-                 
                     <Text style={styles.label}>Name</Text>
                     <View style={styles.inputContainer}>
                       <TextInput
@@ -365,6 +371,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#777',
     marginTop: 20,
+    fontSize: 18,
   },
   closeButton: {
     alignSelf: 'flex-end',
@@ -462,5 +469,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#666',
+    marginTop: 20,
+  },
+  lottieNothing: {
+    width: 200,
+    marginRight:30,
+    height: 200,
   },
 });
