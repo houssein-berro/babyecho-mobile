@@ -1,3 +1,4 @@
+// babySlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -15,7 +16,8 @@ const babySlice = createSlice({
       state.error = null;
     },
     addBabySuccess(state, action) {
-      state.babies.push(action.payload);
+      console.log("New baby added:", action.payload); // Check if the baby is being added
+      state.babies.push(action.payload); // Add new baby to the babies array
       state.loading = false;
     },
     addBabyFailure(state, action) {
@@ -25,5 +27,5 @@ const babySlice = createSlice({
   },
 });
 
-export const { addBabyStart, addBabySuccess, addBabyFailure } = babySlice.actions; 
+export const { addBabyStart, addBabySuccess, addBabyFailure } = babySlice.actions;
 export default babySlice.reducer;
