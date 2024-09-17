@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,21 +8,25 @@ import {
   Platform,
   Modal,
   ActivityIndicator,
-  Animated,  // Import Animated for animations
-  Vibration   // Import Vibration for feedback
+  Animated,
+  Vibration,
+  FlatList,
+  SafeAreaView,
+  Dimensions,
+  ScrollView,
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
-import {useDispatch, useSelector} from 'react-redux';
-import {uploadRecording} from '../../redux/recording/RecordingActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { uploadRecording } from '../../redux/recording/RecordingActions';
 import Button from '../../components/button/button';
 import CustomModal from '../../components/customModal/customModal';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
+const { height } = Dimensions.get('window');
 
-export default function RecordingScreen({navigation}) {
+export default function RecordingScreen({ navigation }) {
   const [isRecording, setIsRecording] = useState(false);
   const [dots, setDots] = useState('');
   const [recordSecs, setRecordSecs] = useState(0);
@@ -33,28 +37,30 @@ export default function RecordingScreen({navigation}) {
   const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState('');
   const [timer, setTimer] = useState(7);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [selectedBaby, setSelectedBaby] = useState(null);
   const dispatch = useDispatch();
 
   const user = useSelector(state => state.user.user);
   const userId = user ? user._id : null;
   const babies = user ? user.babies : [];
-  const [babyId, setBabyId] = useState(babies.length > 0 ? babies[0]._id : null);
+  const babyId = selectedBaby ? selectedBaby._id : (babies.length > 0 ? babies[0]._id : null);
 
   const isRecordingDisabled = !babyId;
 
-  // Animation setup for picker
-  const slideAnim = useRef(new Animated.Value(-100)).current; // Start out of view
+  const slideAnim = useRef(new Animated.Value(0)).current; 
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
 
   useEffect(() => {
-    // Only animate the picker when not recording
-    if (!isRecording) {
-      Animated.timing(slideAnim, {
-        toValue: 0,  // Slide into view
-        duration: 500,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [isRecording]);
+    Animated.timing(slideAnim, {
+      toValue: dropdownVisible ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [dropdownVisible]);
 
   const checkAndRequestPermissions = async () => {
     let permissionsToRequest = [PermissionsAndroid.PERMISSIONS.RECORD_AUDIO];
@@ -168,130 +174,193 @@ export default function RecordingScreen({navigation}) {
     }
   }, [formData, dispatch]);
 
+  useEffect(() => {
+    checkAndRequestPermissions();
+  }, []);
+
+  const handleRetry = () => {
+    setModalVisible(false);
+    checkAndRequestPermissions();
+  };
+
+  const handlePressItem = (item) => {
+    setSelectedBaby(item);
+    setDropdownVisible(false);
+  };
+
+  const renderBabyItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.babyItem}
+      onPress={() => handlePressItem(item)}
+      accessibilityRole="button"
+      accessibilityLabel={`Select baby ${item.name}`}
+    >
+      <Text style={styles.babyItemText}>{item.name}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderDropdown = () => {
+    return (
+      <Modal
+        transparent={true}
+        visible={dropdownVisible}
+        animationType="fade"
+        onRequestClose={() => setDropdownVisible(false)}
+      >
+        <TouchableOpacity style={styles.modalOverlay} onPress={() => setDropdownVisible(false)}>
+          <Animated.View style={[styles.dropdownModal, {
+            transform: [{
+              scale: slideAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.8, 1],
+              }),
+            }],
+            opacity: slideAnim,
+          }]}>
+            <FlatList
+              data={babies}
+              renderItem={renderBabyItem}
+              keyExtractor={item => item._id.toString()}
+              ItemSeparatorComponent={() => <View style={styles.separator} />}
+            />
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
+    );
+  };
+
   return (
     <ScreenWrapper>
-      <View style={styles.container}>
-        {/* Conditionally render baby picker only when not recording */}
-        {!isRecording && (
-          <Animated.View style={[styles.babyPickerContainer, {transform: [{translateY: slideAnim}]}]}>
-            <TouchableOpacity
-              onPress={() => {
-                Vibration.vibrate(50);
-              }}
-              activeOpacity={0.8}
-              style={styles.touchablePickerArea}
-            >
-              <Text style={styles.babyLabel}>Select Baby</Text>
-              <View style={styles.pickerWrapper}>
-                <Picker
-                  selectedValue={babyId}
-                  onValueChange={(itemValue) => setBabyId(itemValue)}
-                  style={styles.picker}
-                  dropdownIconColor={'#FF6B6B'}
-                >
-                  {babies.map(baby => (
-                    <Picker.Item key={baby._id} label={baby.name} value={baby._id} />
-                  ))}
-                </Picker>
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
-        )}
-
-        {!loading && (
-          <Text style={styles.title}>
-            {isRecording ? 'Recording...' : 'Ready to Record'}
-          </Text>
-        )}
-
-        {isRecording && (
-          <Text style={styles.timerText}>Time left: {timer} seconds</Text>
-        )}
-
-        <View style={styles.microphoneContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              if (isRecordingDisabled) {
-                setModalVisible(true);
-              } else {
-                isRecording ? stopRecording() : startRecording();
-              }
-            }}
-            style={[
-              styles.outerCircle,
-              isRecordingDisabled && styles.disabled,
-            ]}>
-            <View style={styles.innerCircle}>
-              {isRecording ? (
-                <Text style={styles.dots}>{dots}</Text>
-              ) : (
-                <FontAwesome name="microphone" size={60} color="#FF6B6B" />
-              )}
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {isRecording && (
-          <Text style={styles.warningText}>
-            * For best results, make sure the audio is exactly 7 seconds long.
-          </Text>
-        )}
-
-        <Text style={styles.description}>
-          {isRecording
-            ? 'Tap the microphone to stop recording.'
-            : 'Tap the microphone to start recording.'}
-        </Text>
-
-        {isRecording && (
-          <View style={styles.buttonGroup}>
-            <Button
-              title="Cancel"
-              onPress={cancelRecording}
-              style={styles.cancelButton}
-              outlined={true}
-            />
-            <Button
-              title="Stop"
-              onPress={stopRecording}
-              style={styles.stopButton}
-            />
-          </View>
-        )}
-
-        {loading && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#FF6B6B" />
-            <Text style={styles.loadingText}>Processing your prediction...</Text>
-          </View>
-        )}
-
-        <Modal
-          transparent={true}
-          visible={predictionPopupVisible}
-          animationType="slide"
-          onRequestClose={() => setPredictionPopupVisible(false)}
-        >
-          <View style={styles.modalBackground}>
-            <View style={styles.predictionContainer}>
-              <Text style={styles.predictionTitle}>AI Prediction</Text>
-              <Text style={styles.predictionText}>{prediction}</Text>
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+          {/* Custom Dropdown for Baby Selection */}
+          {!isRecording && (
+            <View style={styles.dropdownContainer}>
               <TouchableOpacity
-                onPress={() => setPredictionPopupVisible(false)}
-                style={styles.closeButton}
+                onPress={toggleDropdown}
+                activeOpacity={0.8}
+                style={styles.dropdownButton}
+                accessibilityRole="button"
+                accessibilityLabel="Select Baby"
               >
-                <Text style={styles.closeButtonText}>Close</Text>
+                <Text style={styles.dropdownButtonText}>
+                  {selectedBaby ? selectedBaby.name : 'Select Baby'}
+                </Text>
+                <FontAwesome name={dropdownVisible ? "chevron-up" : "chevron-down"} size={20} color="#FF6B6B" />
+              </TouchableOpacity>
+              {dropdownVisible && renderDropdown()}
+            </View>
+          )}
+
+          <View style={styles.contentContainer}>
+            {!loading && (
+              <Text style={styles.title}>
+                {isRecording ? 'Recording...' : 'Ready to Record'}
+              </Text>
+            )}
+
+            {isRecording && (
+              <Text style={styles.timerText}>Time left: {timer} seconds</Text>
+            )}
+
+            <View style={styles.microphoneContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  if (isRecordingDisabled) {
+                    setModalVisible(true);
+                  } else {
+                    isRecording ? stopRecording() : startRecording();
+                  }
+                }}
+                style={[
+                  styles.outerCircle,
+                  isRecordingDisabled && styles.disabled,
+                ]}
+                activeOpacity={isRecordingDisabled ? 1 : 0.7}
+                accessibilityRole="button"
+                accessibilityLabel={isRecording ? "Stop Recording" : "Start Recording"}
+              >
+                <View style={styles.innerCircle}>
+                  {isRecording ? (
+                    <Text style={styles.dots}>{dots}</Text>
+                  ) : (
+                    <FontAwesome name="microphone" size={60} color="#FF6B6B" />
+                  )}
+                </View>
               </TouchableOpacity>
             </View>
-          </View>
-        </Modal>
 
-        <CustomModal
-          isVisible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          onAddBaby={() => navigation.navigate('AddBaby')}
-        />
-      </View>
+            {isRecording && (
+              <Text style={styles.warningText}>
+                * For best results, make sure the audio is exactly 7 seconds long.
+              </Text>
+            )}
+
+            <Text style={styles.description}>
+              {isRecording
+                ? 'Tap the microphone to stop recording.'
+                : 'Tap the microphone to start recording.'}
+            </Text>
+
+            {isRecording && (
+              <View style={styles.buttonGroup}>
+                <Button
+                  title="Cancel"
+                  onPress={cancelRecording}
+                  style={styles.cancelButton}
+                  outlined={true}
+                />
+                <Button
+                  title="Stop"
+                  onPress={stopRecording}
+                  style={styles.stopButton}
+                />
+              </View>
+            )}
+
+            {loading && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#FF6B6B" />
+                <Text style={styles.loadingText}>Processing your prediction...</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Prediction Modal */}
+          <Modal
+            transparent={true}
+            visible={predictionPopupVisible}
+            animationType="slide"
+            onRequestClose={() => setPredictionPopupVisible(false)}
+          >
+            <View style={styles.modalBackground}>
+              <View style={styles.predictionContainer}>
+                <Text style={styles.predictionTitle}>AI Prediction</Text>
+                <Text style={styles.predictionText}>{prediction}</Text>
+                <TouchableOpacity
+                  onPress={() => setPredictionPopupVisible(false)}
+                  style={styles.closeButton}
+                  accessibilityRole="button"
+                  accessibilityLabel="Close Prediction"
+                >
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Permissions Modal */}
+          <CustomModal
+            isVisible={modalVisible}
+            onClose={() => setModalVisible(false)}
+            onAddBaby={() => navigation.navigate('AddBaby')}
+            title="Permissions Required"
+            message="Please grant audio and storage permissions to record."
+            buttonText="Retry"
+            onButtonPress={handleRetry}
+          />
+        </ScrollView>
+      </SafeAreaView>
     </ScreenWrapper>
   );
 }
@@ -299,55 +368,82 @@ export default function RecordingScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
+
   },
-  babyPickerContainer: {
-    width: '100%',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+  },
+  dropdownContainer: {
+    marginBottom: 20,
+    zIndex: 1,
+  },
+  dropdownButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
     backgroundColor: '#fff',
     borderRadius: 10,
-    elevation: 2,  // Add a shadow effect to make it pop
+    borderWidth: 1,
+    borderColor: '#FF6B6B',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 5,
-    marginBottom: 20,
+    elevation: 3,
   },
-  pickerWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#FF6B6B',
-  },
-  picker: {
-    flex: 1,
+  dropdownButtonText: {
+    fontSize: 18,
     color: '#333',
   },
-  babyLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FF6B6B',
-    marginBottom: 5,
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  dropdownModal: {
+    width: '80%',
+    maxHeight: height * 0.4,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  babyItem: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+  },
+  babyItemText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#eee',
+    marginHorizontal: 20,
+  },
+  contentContainer: {
+    alignItems: 'center',
+    marginTop: 10,
   },
   title: {
     fontSize: 23,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#333',
-    marginBottom: 40,
-    alignSelf: 'center'
+    marginBottom: 20,
+    textAlign: 'center',
   },
   timerText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#FF6B6B',
     marginBottom: 20,
   },
   microphoneContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   warningText: {
     color: '#FF6B6B',
@@ -363,7 +459,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 5},
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 5,
@@ -396,11 +492,15 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    marginRight: 5,
+    marginRight: 10,
+    backgroundColor: '#fff',
+    borderColor: '#FF6B6B',
+    borderWidth: 1,
   },
   stopButton: {
     flex: 1,
-    marginLeft: 5,
+    marginLeft: 10,
+    backgroundColor: '#FF6B6B',
   },
   disabled: {
     opacity: 0.5,
@@ -438,7 +538,7 @@ const styles = StyleSheet.create({
   },
   predictionTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#FF6B6B',
     marginBottom: 15,
     textTransform: 'uppercase',
@@ -449,7 +549,6 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     lineHeight: 26,
-    fontStyle: 'italic',
     letterSpacing: 0.8,
   },
   closeButton: {
@@ -462,6 +561,6 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
 });
