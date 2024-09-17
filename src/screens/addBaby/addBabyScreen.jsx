@@ -10,37 +10,55 @@ import {
   Platform,
   Modal,
   FlatList,
-  TouchableOpacity,
+  Pressable,
   Keyboard,
-  TouchableWithoutFeedback, // Import this
+  TouchableWithoutFeedback,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { addBabyToUser } from '../../redux/babies/babyActions';
+import { addBabyToUser } from '../../redux/auth/authActions';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import ButtonComponent from '../../components/button/button';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import HorizontalLine from '../../components/horizontalLine/horizontalLine';
+import LottieView from 'lottie-react-native'; // Import Lottie
+
+const screenWidth = Dimensions.get('window').width;
 
 export default function BabyScreen({ navigation }) {
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState('');
   const [isMale, setIsMale] = useState(true);
   const [showAddBaby, setShowAddBaby] = useState(false);
+  const [loading, setLoading] = useState(true); // Loading state
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const dispatch = useDispatch();
-  const user = useSelector(state => state.user.user);
+  const user = useSelector(state => state.user?.user);
+
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardVisible(true);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false);
-    });
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
 
     return () => {
       keyboardDidHideListener.remove();
       keyboardDidShowListener.remove();
+      clearTimeout(timer);
     };
   }, []);
 
@@ -95,26 +113,54 @@ export default function BabyScreen({ navigation }) {
     );
   };
 
-  const renderBabyItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.babyCard}
-      onPress={() => navigation.navigate('BabyDetails', { baby: item })}>
-      <FontAwesome
-        name={item.gender === 'Male' ? 'male' : 'female'}
-        size={24}
-        color={item.gender === 'Male' ? '#61dbfb' : '#f7b7d2'}
-      />
-      <View style={styles.babyInfo}>
-        <Text style={styles.babyName}>{item.name}</Text>
-        <Text style={styles.babyDetails}>
-          Birthdate: {item.birthdate.split('T')[0]}
-        </Text>
-        <Text style={styles.babyDetails}>Gender: {item.gender}</Text>
-      </View>
-      {/* Right arrow icon for navigation */}
-      <FontAwesome name="chevron-right" size={24} color="#9E9E9E" />
-    </TouchableOpacity>
-  );
+  const handleBabyPressIn = (animatedWidth, baby) => {
+    Animated.timing(animatedWidth, {
+      toValue: screenWidth,
+      duration: 1000,
+      useNativeDriver: false,
+    }).start(({ finished }) => {
+      if (finished) {
+        navigation.navigate('BabyRecordingsScreen', { baby });
+      }
+    });
+  };
+
+  const handleBabyPressOut = animatedWidth => {
+    Animated.timing(animatedWidth, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const renderBabyItem = ({ item, index }) => {
+    const animatedWidth = new Animated.Value(0);
+    console.log('Rendering baby item:', item); 
+
+    return (
+      <Pressable
+        style={[styles.babyCard, { backgroundColor: '#fff' }]}
+        onPressIn={() => handleBabyPressIn(animatedWidth, item)}
+        onPressOut={() => handleBabyPressOut(animatedWidth)}>
+        <Animated.View
+          style={[styles.filler, { width: animatedWidth, borderRadius: 10 }]}
+        />
+        <FontAwesome
+          name={item.gender === 'Male' ? 'male' : 'female'}
+          size={24}
+          color={item.gender === 'Male' ? '#61dbfb' : '#f7b7d2'}
+        />
+        <View style={styles.babyInfo}>
+          <Text style={styles.babyName}>{item.name}</Text>
+          <Text style={styles.babyDetails}>
+            Birthdate: {item?.birthdate ? item.birthdate.split('T')[0] : 'N/A'}
+          </Text>
+          <Text style={styles.babyDetails}>Gender: {item.gender}</Text>
+        </View>
+        <FontAwesome name="chevron-right" size={24} color="#9E9E9E" />
+      </Pressable>
+    );
+  };
 
   return (
     <ScreenWrapper>
@@ -123,37 +169,47 @@ export default function BabyScreen({ navigation }) {
         style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
         <View style={styles.container}>
-          <FlatList
-            data={user?.babies}
-            renderItem={renderBabyItem}
-            keyExtractor={(item, index) => index.toString()}
-            ListEmptyComponent={
-              <Text style={styles.noBabiesText}>No babies added yet.</Text>
-            }
-            contentContainerStyle={styles.babiesListContainer}
-          />
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <LottieView
+                source={require('../../assets/public/loading.json')} // Replace with your Lottie animation file
+                autoPlay
+                loop
+                style={styles.lottie}
+              />
+            </View>
+          ) : (
+            <FlatList
+              data={user?.babies}
+              renderItem={renderBabyItem}
+              keyExtractor={(item, index) =>
+                item?._id ? item._id.toString() : index.toString()
+              }
+              ListEmptyComponent={
+                <Text style={styles.noBabiesText}>No babies added yet.</Text>
+              }
+              contentContainerStyle={styles.babiesListContainer}
+            />
+          )}
 
-          {/* Add Baby Modal */}
           <Modal
-            animationType="slide"
+            animationType="fade"
             transparent={true}
             visible={showAddBaby}
             onRequestClose={() => setShowAddBaby(false)}>
-            
-            {/* Detect touch outside modal to close */}
             <TouchableWithoutFeedback onPress={() => setShowAddBaby(false)}>
               <View style={styles.modalOverlay}>
                 <TouchableWithoutFeedback>
                   <View style={styles.modalContent}>
-                    {/* X button to close modal */}
-                    <TouchableOpacity
+                    <Pressable
                       style={styles.closeButton}
                       onPress={() => setShowAddBaby(false)}>
                       <FontAwesome name="close" size={24} color="#9E9E9E" />
-                    </TouchableOpacity>
+                    </Pressable>
 
                     <Text style={styles.formTitle}>Add Your Baby</Text>
 
+                 
                     <Text style={styles.label}>Name</Text>
                     <View style={styles.inputContainer}>
                       <TextInput
@@ -230,7 +286,10 @@ export default function BabyScreen({ navigation }) {
                     </View>
 
                     <View style={styles.buttonRow}>
-                      <ButtonComponent title="Add Baby" onPress={handleAddBaby} />
+                      <ButtonComponent
+                        title="Add Baby"
+                        onPress={handleAddBaby}
+                      />
                     </View>
                   </View>
                 </TouchableWithoutFeedback>
@@ -260,7 +319,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     paddingBottom: 40,
-    paddingTop: 40,
   },
   babiesListContainer: {
     paddingBottom: 20,
@@ -268,16 +326,27 @@ const styles = StyleSheet.create({
   babyCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',  // Space between baby info and arrow
+    justifyContent: 'space-between',
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
     backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 1,
+    position: 'relative',
+    overflow: 'hidden', 
+  },
+  filler: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: '#d3d3d3',
+    zIndex: -1,
+    borderRadius: 10,
   },
   babyInfo: {
     marginLeft: 10,
@@ -297,9 +366,8 @@ const styles = StyleSheet.create({
     color: '#777',
     marginTop: 20,
   },
- 
   closeButton: {
-    alignSelf: 'flex-end', // Align the close button to the top right corner
+    alignSelf: 'flex-end',
     marginBottom: 10,
   },
   formTitle: {
@@ -350,7 +418,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   switch: {
-    transform: [{scaleX: 1.5}, {scaleY: 1.5}],
+    transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],
   },
   buttonRow: {
     flexDirection: 'row',
@@ -367,11 +435,11 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
   },
-    modalOverlay: {
+  modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     width: '90%',
@@ -384,5 +452,15 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
   },
-
+  lottie: {
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
