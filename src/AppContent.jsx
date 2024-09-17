@@ -4,7 +4,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { validateToken } from './redux/auth/authActions';
-
 import OnboardingNavigator from './components/navigation/onboardingNavigator';
 import MainStackNavigator from './components/navigation/mainStackNavigator';
 import LoginScreen from './screens/auth/loginScreen';
@@ -25,8 +24,7 @@ export default function AppContent() {
         setInitialRoute('Main');
       } else {
         setInitialRoute('Onboarding');
-      await AsyncStorage.removeItem('token');
-
+        await AsyncStorage.removeItem('token');
       }
       setIsLoading(false);
     };
@@ -34,7 +32,7 @@ export default function AppContent() {
   }, [dispatch]);
 
   if (isLoading) {
-    return <MoonAndStarsSpinner/>;
+    return <MoonAndStarsSpinner />;
   }
 
   return (
@@ -55,7 +53,6 @@ export default function AppContent() {
           component={SignupScreen}
           options={{ headerShown: false }}
         />
-        
         <Stack.Screen
           name="Main"
           component={MainStackNavigator}
