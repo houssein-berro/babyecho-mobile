@@ -10,7 +10,9 @@ import {
   signupFailure, 
   addBabyFailure,
   addBabySuccess,
-  addBabyStart  // Add this to your import
+  addBabyStart,
+  logoutSuccess,
+  logoutFailure
 } from './authSlice';
 
 
@@ -18,9 +20,7 @@ import {
 export const loginUser = (userData) => async (dispatch) => {
   dispatch(loginStart());
   try {
-    console.log('====================================');
-    console.log(BACKEND_URL)
-    console.log('====================================');
+
     const response = await axios.post(`${BACKEND_URL}/api/auth/login`, userData);
     dispatch(loginSuccess(response.data));
     await AsyncStorage.setItem('token', response?.data.token);
@@ -31,15 +31,19 @@ export const loginUser = (userData) => async (dispatch) => {
   }
 };
 
-// Signup action creator
+// signup action
 export const signupUser = (userData) => async (dispatch) => {
   dispatch(signupStart());
   try {
     const response = await axios.post(`${BACKEND_URL}/api/auth/signup`, userData);
     dispatch(signupSuccess(response.data));
     await AsyncStorage.setItem('token', response?.data.token);
+    console.log('Signup success: ', response.data);  // Add logging here
+    return true;
   } catch (error) {
     dispatch(signupFailure(error.response?.data?.message || error.message || "Signup failed"));
+    console.log('Signup failed: ', error);  // Add logging here
+    return false;
   }
 };
 
@@ -79,11 +83,22 @@ export const addBabyToUser = (userId, babyData) => async (dispatch) => {
         },
       }
     );
-    console.log("API Response for added baby:", response.data);  // Ensure it includes all fields
+    console.log("API Response for added baby:", response.data);
 
 
     dispatch(addBabySuccess(response.data));
   } catch (error) {
     dispatch(addBabyFailure(error.response?.data?.message || error.message || 'Failed to add baby'));
+  }
+};
+
+export const logout = () => async (dispatch) => {
+  try {
+    await AsyncStorage.removeItem('token');
+    
+    dispatch(logoutSuccess());
+    navigation.replace('Login');
+  } catch (error) {
+    dispatch(logoutFailure());
   }
 };
