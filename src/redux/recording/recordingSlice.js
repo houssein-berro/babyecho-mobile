@@ -2,9 +2,9 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   recordings: [],
-  mlResponse:"",
+  mlResponse: "",
   status: 'idle',
-  error: null
+  error: null,
 };
 
 const recordingSlice = createSlice({
@@ -22,11 +22,28 @@ const recordingSlice = createSlice({
       state.status = 'failed';
       state.error = action.payload;
     },
-
+    // Add these reducers
+    fetchRecordingsStart(state) {
+      state.status = 'loading';
+    },
+    fetchRecordingsSuccess(state, action) {
+      state.recordings = action.payload;
+      state.status = 'succeeded';
+    },
+    fetchRecordingsFailure(state, action) {
+      state.status = 'failed';
+      state.error = action.payload;
+    },
   },
 });
 
-export const { uploadStart, uploadSuccess, uploadFailure } = recordingSlice.actions;
+export const {
+  uploadStart,
+  uploadSuccess,
+  uploadFailure,
+  fetchRecordingsStart,
+  fetchRecordingsSuccess,
+  fetchRecordingsFailure,
+} = recordingSlice.actions;
 
 export default recordingSlice.reducer;
- 
