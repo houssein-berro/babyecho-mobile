@@ -1,19 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Modal,
 } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import ScreenWrapper from '../../components/screenWrapper/screenWrapper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
+import { logout } from '../../redux/auth/authActions';
 
 export default function HomeScreen({ navigation }) {
   const auth = useSelector(state => state.user.user);
+  const dispatch = useDispatch();
+
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (!auth) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    }
+  }, [auth, navigation]); 
+  const handleLogout = () => {
+    dispatch(logout());
+    setLogoutModalVisible(false);
+  };
 
   return (
     <ScreenWrapper>
@@ -21,12 +39,19 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.welcomeText}>
           Hi, {auth ? auth.username : 'User'}
         </Text>
-        <Text style={styles.subtitle}>What would you like to do today?</Text>
+
+        {/* Logout button in the header */}
+        <TouchableOpacity
+          onPress={() => setLogoutModalVisible(true)}
+          style={styles.logoutButton}>
+          <MaterialCommunityIcons name="logout" size={24} color="#EF8D7F" />
+        </TouchableOpacity>
       </View>
+      <Text style={styles.subtitle}>What would you like to do today?</Text>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Add Member Section */}
         <View style={styles.featuredContent}>
-          {/* Add Member Section */}
           <TouchableOpacity
             style={styles.featuredItem}
             onPress={() => navigation.navigate('Babies')}
@@ -98,6 +123,34 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        visible={logoutModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setLogoutModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Confirm Logout</Text>
+            <Text style={styles.modalMessage}>
+              Are you sure you want to logout?
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setLogoutModalVisible(false)}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.confirmButton]}
+                onPress={handleLogout}>
+                <Text style={styles.buttonText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScreenWrapper>
   );
 }
@@ -105,6 +158,9 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   header: {
     marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   welcomeText: {
     fontSize: 24,
@@ -115,6 +171,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     marginTop: 3,
+  },
+  logoutButton: {
+    padding: 10,
   },
   featuredContent: {},
   featuredItem: {
@@ -152,7 +211,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   helpContainer: {
-    backgroundColor: '#fde9e5', 
+    backgroundColor: '#fde9e5',
     padding: 20,
     borderRadius: 15,
     marginVertical: 20,
@@ -185,5 +244,49 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginRight: 5,
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: '#ccc',
+  },
+  confirmButton: {
+    backgroundColor: '#EF8D7F',
+  },
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+  },
 });
- 
