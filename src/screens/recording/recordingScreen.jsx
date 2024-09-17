@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,11 +9,11 @@ import {
   Modal,
   ActivityIndicator,
   Animated,
-  Vibration,
   FlatList,
   SafeAreaView,
   Dimensions,
   ScrollView,
+  Alert,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
@@ -51,7 +51,19 @@ export default function RecordingScreen({ navigation }) {
   const slideAnim = useRef(new Animated.Value(0)).current; 
 
   const toggleDropdown = () => {
-    setDropdownVisible(!dropdownVisible);
+    if (babies.length > 0) {
+      setDropdownVisible(!dropdownVisible);
+    } else {
+      Alert.alert(
+        'No Babies Available',
+        'Please add a baby before recording.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Add Baby', onPress: () => navigation.navigate('AddBaby') },
+        ],
+        { cancelable: true }
+      );
+    }
   };
 
   useEffect(() => {
@@ -233,8 +245,8 @@ export default function RecordingScreen({ navigation }) {
     <ScreenWrapper>
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-          {/* Custom Dropdown for Baby Selection */}
-          {!isRecording && (
+          {/* Conditional Rendering Based on Babies Availability */}
+          {babies.length > 0 ? (
             <View style={styles.dropdownContainer}>
               <TouchableOpacity
                 onPress={toggleDropdown}
@@ -249,6 +261,15 @@ export default function RecordingScreen({ navigation }) {
                 <FontAwesome name={dropdownVisible ? "chevron-up" : "chevron-down"} size={20} color="#FF6B6B" />
               </TouchableOpacity>
               {dropdownVisible && renderDropdown()}
+            </View>
+          ) : (
+            <View style={styles.emptyStateContainer}>
+              <Text style={styles.emptyStateText}>No babies found. Please add a baby to start recording.</Text>
+              <Button
+                title="Add Baby"
+                onPress={() => navigation.navigate('AddBaby')}
+                style={styles.addBabyButton}
+              />
             </View>
           )}
 
@@ -274,17 +295,17 @@ export default function RecordingScreen({ navigation }) {
                 }}
                 style={[
                   styles.outerCircle,
-                  isRecordingDisabled && styles.disabled,
+                  isRecordingDisabled && styles.disabledOuterCircle,
                 ]}
                 activeOpacity={isRecordingDisabled ? 1 : 0.7}
                 accessibilityRole="button"
                 accessibilityLabel={isRecording ? "Stop Recording" : "Start Recording"}
               >
-                <View style={styles.innerCircle}>
+                <View style={[styles.innerCircle, isRecordingDisabled && styles.disabledInnerCircle]}>
                   {isRecording ? (
                     <Text style={styles.dots}>{dots}</Text>
                   ) : (
-                    <FontAwesome name="microphone" size={60} color="#FF6B6B" />
+                    <FontAwesome name="microphone" size={60} color={isRecordingDisabled ? "#ccc" : "#FF6B6B"} />
                   )}
                 </View>
               </TouchableOpacity>
@@ -368,11 +389,11 @@ export default function RecordingScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'flex-start',
+    padding: 20,
   },
   dropdownContainer: {
     marginBottom: 20,
@@ -422,6 +443,24 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#eee',
     marginHorizontal: 20,
+  },
+  emptyStateContainer: {
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+    paddingHorizontal: 20,
+  },
+  addBabyButton: {
+    padding: 15,
+    backgroundColor: '#FF6B6B',
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 20,
   },
   contentContainer: {
     alignItems: 'center',
@@ -502,8 +541,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     backgroundColor: '#FF6B6B',
   },
-  disabled: {
-    opacity: 0.5,
+  disabledOuterCircle: {
+    backgroundColor: '#F5F5F5',
+    borderColor: '#ccc',
+    opacity: 0.8,
+  },
+  disabledInnerCircle: {
+    backgroundColor: '#f0f0f0',
   },
   loadingContainer: {
     marginTop: 30,
