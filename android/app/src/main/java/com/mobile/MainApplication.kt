@@ -11,6 +11,7 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
 import com.reactnativecommunity.picker.RNCPickerPackage;
+import com.airbnb.android.react.lottie.LottiePackage;
 
 class MainApplication : Application(), ReactApplication {
 
@@ -21,6 +22,8 @@ class MainApplication : Application(), ReactApplication {
               // Packages that cannot be autolinked yet can be added manually here, for example:
               // add(MyReactNativePackage())
               add(RNCPickerPackage())
+              add(LottiePackage())
+
             }
 
         override fun getJSMainModuleName(): String = "index"
