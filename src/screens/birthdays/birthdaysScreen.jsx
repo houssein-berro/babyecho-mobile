@@ -214,3 +214,115 @@ export default function BirthdaysCountdownScreen({ navigation }) {
     </ScreenWrapper>
   );
 }
+
+const styles = StyleSheet.create({
+  cardContainer: {
+    marginBottom: 12,
+  },
+  card: {
+    borderRadius: 15,
+    padding: 15,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  letterPlaceholder: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#F6B7A3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 15,
+    elevation: 1,
+  },
+  letter: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  infoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  babyName: {
+    fontSize: 22,
+    fontWeight: '500',
+    fontFamily: 'roboto',
+    color: '#333',
+  },
+  countdownText: {
+    fontSize: 16,
+    color: '#EF8D7F',
+    marginTop: 5,
+  },
+  birthdayText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 3,
+  },
+  progressBar: {
+    marginTop: 10,
+    height: 8,
+    borderRadius: 5,
+    backgroundColor: '#f2f2f2',
+  },
+  reminderButton: {
+    marginTop: 15,
+    backgroundColor: '#EF8D7F',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  reminderButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    color: '#333',
+    marginBottom: 15,
+  },
+  closeButton: {
+    backgroundColor: '#EF8D7F',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#666',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lottie: {
+    width: 200,
+    height: 200,
+  },
+});
